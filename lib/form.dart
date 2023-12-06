@@ -5,11 +5,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:kanon_app/enum.dart';
 import 'package:kanon_app/main.dart';
-import 'package:kanon_app/report.dart';
 import 'package:kanon_app/report_model.dart';
-import 'package:riverpod/riverpod.dart';
+
+
 
 
 
@@ -48,7 +49,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Form widgets'),
+        title: const Text('仕事の記録'),
       ),
       body: Form(
         key: _formKey,
@@ -196,6 +197,12 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
       );
       if (picked != null && picked != startTime) {
         setState(() {
@@ -206,6 +213,13 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+        
       );
       if (picked != null && picked != endTime) {
         setState(() {
@@ -230,6 +244,7 @@ class _FormDatePicker extends StatefulWidget {
 }
 
 class _FormDatePickerState extends State<_FormDatePicker> {
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -252,9 +267,12 @@ class _FormDatePickerState extends State<_FormDatePicker> {
           },
         ),
         Text(
-          widget.date.toString(),
+          DateFormat('yyyy年MM月dd日').format(widget.date),
         ),
       ],
     );
   }
+  
 }
+
+

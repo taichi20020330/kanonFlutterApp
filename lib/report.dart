@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 @immutable
 class Report {
   final String id;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
+  final TimeOfDay roundUpEndTime;
   final int? fee;
   final String? description;
   final DateTime date;
@@ -15,9 +15,12 @@ class Report {
     required this.id,
     required this.startTime,
     required this.endTime,
+    required this.roundUpEndTime,
     this.fee,
     required this.user,
     this.description,
     required this.date,
   });
+
+  
 }
