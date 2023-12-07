@@ -12,6 +12,16 @@ enum UserLabel {
 
 enum TimeLabel {
   startTime,
-  endTime,
+  endTime, selectTime,
+}
+
+enum OpenFormPageMode {
+  add,
+  edit,
+}
+
+enum TimeSelectButtonMode {
+  startTimeMode,
+  endTimeMode,
 }
 

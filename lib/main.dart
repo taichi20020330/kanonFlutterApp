@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:kanon_app/enum.dart';
 import 'package:kanon_app/form.dart';
 import 'package:kanon_app/report.dart';
 import 'package:kanon_app/report_model.dart';
@@ -9,7 +10,6 @@ import 'package:kanon_app/report_model.dart';
 
 
 
-const _spreadsheetId = '150UbcSS5YEx5ziC7RDx1g9UXDXl4i1nGP2vXpqJE0a4';
 
 final reportListProvider =
     NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
@@ -53,6 +53,7 @@ class Home extends HookConsumerWidget {
     final reports = ref.watch(reportListProvider);
     List<Report> sortedReports = reports.toList()
       ..sort((a, b) => a.date.compareTo(b.date));
+    
 
     Map<String, List<Report>> groupedReports = groupReportsByMonth(sortedReports);
 
@@ -77,44 +78,20 @@ class Home extends HookConsumerWidget {
                   ..sort((a, b) => a.date.compareTo(b.date));
                 Duration totalWorkTime = calculateTotalWorkTime(sortedReports);
                 double monthlySalary = calculateMonthlySalary(totalWorkTime);
+
                 return ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                   children: [
-                    Text(
-                      '合計勤務時間: ${totalWorkTime.inHours} 時間 ${totalWorkTime.inMinutes.remainder(60)} 分',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    Text(
-                      '給与: ${monthlySalary.toInt()}円',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    WorkTimeText(totalWorkTime),
+                    SalaryText(monthlySalary),
                     for (var report in sortedReports) ...[
                       if (sortedReports.indexOf(report) > 0) const Divider(height: 0),
                       ProviderScope(
                         overrides: [
                           _currentReport.overrideWithValue(report),
                         ],
-                        child: Dismissible(
-                          key: Key(report.id),
-                          onDismissed: (direction) {
-                            // Reportを削除する処理
-                            ref.read(reportListProvider.notifier).removeReport(report);
-                          },
-                          background: Container(
-                            color: Colors.red,
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: Icon(Icons.delete, color: Colors.white),
-                          ),
-                          child: const ReportItem(),
+                        child:  const ReportItem(),
                         ),
-                      ),
                     ],
                   ],
                 );
@@ -122,13 +99,35 @@ class Home extends HookConsumerWidget {
               .toList(),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => _openFormPage(context),
+          onPressed: () => _openFormPage(context, OpenFormPageMode.add, null),
           tooltip: 'Increment',
           child: const Icon(Icons.add),
         ),
       ),
     );
+    
   }
+
+  WorkTimeText(Duration totalWorkTime) {
+    return Text(
+      '合計勤務時間: ${totalWorkTime.inHours} 時間 ${totalWorkTime.inMinutes.remainder(60)} 分',
+      style: const TextStyle(
+        fontSize: 14,
+        color: Colors.grey,
+      ),
+    );
+  }
+
+  SalaryText(double monthlySalary) {
+    return Text(
+      '給与: ${monthlySalary.toInt()}円',
+      style: const TextStyle(
+        fontSize: 14,
+        color: Colors.grey,
+      ),
+    );
+  }
+  
   
 
   Duration calculateTotalWorkTime(List<Report> reports) {
@@ -159,14 +158,6 @@ class Home extends HookConsumerWidget {
 
     return groupedReports;
   }
-
-  _openFormPage(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const FormWidgetsDemo(),
-      ),
-    );
-  }
 }
 
 final _currentReport = Provider<Report>((ref) => throw UnimplementedError());
@@ -174,12 +165,10 @@ final _currentReport = Provider<Report>((ref) => throw UnimplementedError());
 class ReportItem extends HookConsumerWidget {
   const ReportItem({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final report = ref.watch(_currentReport);
     String formattedDate = DateFormat('yyyy年MM月dd日').format(report.date);
-
 
     return  Material(
       child: Card(
@@ -187,8 +176,10 @@ class ReportItem extends HookConsumerWidget {
         title: Text(
           selectUser(report.user),
         ),
-        subtitle: Text(formattedDate + ' ' + formatTime(report.startTime) + ' ~ ' + formatTime(report.endTime)),
+        subtitle: Text('$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
+        trailing: const CardMenuTrailing(),
           ),
+          
       ),
     );
   }
@@ -217,3 +208,45 @@ class ReportItem extends HookConsumerWidget {
   }
 }
 
+class CardMenuTrailing extends HookConsumerWidget {
+  const CardMenuTrailing({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final report = ref.watch(_currentReport);
+    return PopupMenuButton(
+      itemBuilder: (context) {
+        return [
+          const PopupMenuItem(
+            value: 'edit',
+            child: Text('編集'),
+          ),
+          const PopupMenuItem(
+            value: 'delete',
+            child: Text('削除'),
+          ),
+        ];
+      },
+      onSelected: (String value) {
+        switch (value) {
+          case 'edit':
+            _openFormPage(context, OpenFormPageMode.edit, report);
+            break;
+          case 'delete':
+            ref.read(reportListProvider.notifier).removeReport(report);
+            break;
+        }
+      },
+    );
+  }
+
+  
+}
+
+_openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FormWidgetsDemo(mode, report),
+      ),
+    );
+  }
