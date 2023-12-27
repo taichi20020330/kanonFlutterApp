@@ -7,21 +7,25 @@ import 'package:kanon_app/form.dart';
 import 'package:kanon_app/report.dart';
 import 'package:kanon_app/report_model.dart';
 // import 'package:flutter_hooks/flutter_hooks.dart';
-
-
-
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 final reportListProvider =
     NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
 
 void main() async {
-
+  //追記するコード
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     const ProviderScope(
       child: MyApp(),
     ),
-  );}
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-       localizationsDelegates: [
+      localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
       ],
       supportedLocales: [
@@ -46,16 +50,15 @@ class MyApp extends StatelessWidget {
 
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
-  
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reports = ref.watch(reportListProvider);
     List<Report> sortedReports = reports.toList()
       ..sort((a, b) => a.date.compareTo(b.date));
-    
 
-    Map<String, List<Report>> groupedReports = groupReportsByMonth(sortedReports);
+    Map<String, List<Report>> groupedReports =
+        groupReportsByMonth(sortedReports);
 
     return DefaultTabController(
       length: groupedReports.keys.length,
@@ -72,31 +75,30 @@ class Home extends HookConsumerWidget {
           ),
         ),
         body: TabBarView(
-          children: groupedReports.entries
-              .map((entry) {
-                List<Report> sortedReports = entry.value.toList()
-                  ..sort((a, b) => a.date.compareTo(b.date));
-                Duration totalWorkTime = calculateTotalWorkTime(sortedReports);
-                double monthlySalary = calculateMonthlySalary(totalWorkTime);
+          children: groupedReports.entries.map((entry) {
+            List<Report> sortedReports = entry.value.toList()
+              ..sort((a, b) => a.date.compareTo(b.date));
+            Duration totalWorkTime = calculateTotalWorkTime(sortedReports);
+            double monthlySalary = calculateMonthlySalary(totalWorkTime);
 
-                return ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-                  children: [
-                    WorkTimeText(totalWorkTime),
-                    SalaryText(monthlySalary),
-                    for (var report in sortedReports) ...[
-                      if (sortedReports.indexOf(report) > 0) const Divider(height: 0),
-                      ProviderScope(
-                        overrides: [
-                          _currentReport.overrideWithValue(report),
-                        ],
-                        child:  const ReportItem(),
-                        ),
+            return ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+              children: [
+                WorkTimeText(totalWorkTime),
+                SalaryText(monthlySalary),
+                for (var report in sortedReports) ...[
+                  if (sortedReports.indexOf(report) > 0)
+                    const Divider(height: 0),
+                  ProviderScope(
+                    overrides: [
+                      _currentReport.overrideWithValue(report),
                     ],
-                  ],
-                );
-              })
-              .toList(),
+                    child: const ReportItem(),
+                  ),
+                ],
+              ],
+            );
+          }).toList(),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openFormPage(context, OpenFormPageMode.add, null),
@@ -105,7 +107,6 @@ class Home extends HookConsumerWidget {
         ),
       ),
     );
-    
   }
 
   WorkTimeText(Duration totalWorkTime) {
@@ -127,13 +128,13 @@ class Home extends HookConsumerWidget {
       ),
     );
   }
-  
-  
 
   Duration calculateTotalWorkTime(List<Report> reports) {
     return reports.fold(Duration.zero, (previous, report) {
-      DateTime startTime = DateTime(2023, 1, 1, report.startTime.hour, report.startTime.minute);
-      DateTime endTime = DateTime(2023, 1, 1, report.roundUpEndTime.hour, report.roundUpEndTime.minute);
+      DateTime startTime =
+          DateTime(2023, 1, 1, report.startTime.hour, report.startTime.minute);
+      DateTime endTime = DateTime(
+          2023, 1, 1, report.roundUpEndTime.hour, report.roundUpEndTime.minute);
       return previous + endTime.difference(startTime);
     });
   }
@@ -143,7 +144,6 @@ class Home extends HookConsumerWidget {
     double totalWorkHours = totalWorkTime.inMinutes / 60.0;
     return totalWorkHours * hourlyWage;
   }
-
 
   Map<String, List<Report>> groupReportsByMonth(List<Report> reports) {
     Map<String, List<Report>> groupedReports = {};
@@ -170,21 +170,21 @@ class ReportItem extends HookConsumerWidget {
     final report = ref.watch(_currentReport);
     String formattedDate = DateFormat('yyyy年MM月dd日').format(report.date);
 
-    return  Material(
+    return Material(
       child: Card(
         child: ListTile(
-        title: Text(
-          selectUser(report.user),
-        ),
-        subtitle: Text('$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
-        trailing: const CardMenuTrailing(),
+          title: Text(
+            selectUser(report.user),
           ),
-          
+          subtitle: Text(
+              '$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
+          trailing: const CardMenuTrailing(),
+        ),
       ),
     );
   }
 
-  String selectUser(int userNumber){
+  String selectUser(int userNumber) {
     switch (userNumber) {
       case 0:
         return '戸松さん';
@@ -203,7 +203,8 @@ class ReportItem extends HookConsumerWidget {
 
   String formatTime(TimeOfDay time) {
     // intlパッケージを使用して24時間形式でフォーマット
-    final formattedTime = DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
+    final formattedTime =
+        DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
     return formattedTime;
   }
 }
@@ -239,14 +240,12 @@ class CardMenuTrailing extends HookConsumerWidget {
       },
     );
   }
-
-  
 }
 
 _openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => FormWidgetsDemo(mode, report),
-      ),
-    );
-  }
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => FormWidgetsDemo(mode, report),
+    ),
+  );
+}

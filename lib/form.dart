@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -95,7 +96,6 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
                         FeeTextField(),
                         DescriptionTextField(),
                         RegisterButton(),
-                      
                       ].expand(
                         (widget) => [
                           widget,
@@ -114,8 +114,6 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
       ),
     );
   }
-
-  
 
   TimeSelectButton(BuildContext context, TimeSelectButtonMode mode) {
     TimeOfDay? selectTime;
@@ -208,10 +206,19 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
     );
   }
 
-  _comfirmForm(BuildContext context) {
+  _comfirmForm(BuildContext context) async {
     ref.read(reportListProvider.notifier).addReport(
         date, startTime!, endTime!, fee, description, selectedUser!.index);
 
+    await FirebaseFirestore.instance
+        .collection('reports') // コレクションID指定
+        .doc() // ドキュメントID自動生成
+        .set({
+      'id': selectedUser.label,
+      'startTime': startTime.toString(),
+      'endTime': endTime.toString(),
+      'fee': fee
+    });
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),
