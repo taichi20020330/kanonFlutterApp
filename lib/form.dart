@@ -11,16 +11,16 @@ import 'package:kanon_app/main.dart';
 import 'package:kanon_app/report.dart';
 import 'package:kanon_app/report_model.dart';
 
-class FormWidgetsDemo extends ConsumerStatefulWidget {
-  FormWidgetsDemo(this.mode, this.currentReport, {super.key});
+class FormPage extends ConsumerStatefulWidget {
+  FormPage({required this.mode, this.currentReport, super.key});
   Report? currentReport;
   final OpenFormPageMode mode;
 
   @override
-  FormWidgetsDemoState createState() => FormWidgetsDemoState();
+  FormPageState createState() => FormPageState();
 }
 
-class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
+class FormPageState extends ConsumerState<FormPage> {
   final TextEditingController userController = TextEditingController();
 
   UserLabel selectedUser = UserLabel.user0;

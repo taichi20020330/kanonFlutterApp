@@ -25,3 +25,10 @@ enum TimeSelectButtonMode {
   endTimeMode,
 }
 
+
+enum PageType {
+  Report,
+  Calender,
+  Settings
+}
+
