@@ -13,8 +13,30 @@ Future<List<Work>> works(WorksRef ref) async {
   final response = await http.get(Uri.https('api.sssapi.app', 'h6y_ywkD7tbejTS7XcDLT'));
   // Using dart:convert, we then decode the JSON payload into a Map data structure.
   List<dynamic> jsonList = jsonDecode(response.body);
-  List<Work> works = jsonList.map((json) => Work.fromJson(json as Map<String, dynamic>)).toList();
+  List<Work> works = jsonList.map((json) {
+      // Use parseJapaneseDate to convert the date string to DateTime.
+      DateTime parsedDate = parseJapaneseDate(json['date'] as String);
+      
+      // Create a Work object with the parsed DateTime.
+      return Work.fromJson({
+        ...json,
+        'date': parsedDate,
+      });
+    }).toList();
   return works;
+}
+
+DateTime parseJapaneseDate(String dateString) {
+  List<String> parts = dateString.split('/');
+  if (parts.length == 3) {
+    int year = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
+    int day = int.parse(parts[2]);
+    
+    return DateTime(year, month, day);
+  } else {
+    throw FormatException("Invalid date format: $dateString");
+  }
 }
 
 

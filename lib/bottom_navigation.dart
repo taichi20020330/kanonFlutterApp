@@ -6,6 +6,8 @@ import 'package:kanon_app/enum.dart';
 import 'package:kanon_app/form.dart';
 import 'package:kanon_app/home.dart';
 import 'package:kanon_app/main.dart';
+import 'package:kanon_app/schedule_list_page.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class BottomNavigationPage extends ConsumerWidget {
   const BottomNavigationPage({super.key});
@@ -20,7 +22,7 @@ class BottomNavigationPage extends ConsumerWidget {
     switch(currentPage) {
       case PageType.Report:
         appBarTitle = "Report";
-        bodyWidget = Home();
+        bodyWidget = ScheduleListPage();
         break;
       case PageType.Calender:
         appBarTitle = "Calender";

@@ -14,6 +14,7 @@ import 'package:kanon_app/work.dart';
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
   
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reports = ref.watch(reportListProvider);
@@ -76,32 +77,7 @@ class Home extends HookConsumerWidget {
     );
   }
 
-  ScheduleList(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Work>> works = ref.watch(worksProvider);
-    return Center(
-      child: works.when(
-        data: (worksList) {
-          if (worksList.isEmpty) {
-            return const Text('No works available.');
-          }
-
-          return ListView.builder(
-            itemCount: worksList.length,
-            itemBuilder: (context, index) {
-              final work = worksList[index];
-              return ListTile(
-                title: Text(work.id),
-                subtitle: Text(work.date),
-                // 他のアクティビティプロパティにアクセスするには、ここに追加
-              );
-            },
-          );
-        },
-        loading: () => const CircularProgressIndicator(),
-        error: (error, stackTrace) => Text('Error: $error'),
-      ),
-    );
-  }
+  
 
   WorkTimeText(Duration totalWorkTime) {
     return Text(

@@ -21,7 +21,7 @@ Work _$WorkFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Work {
   String get id => throw _privateConstructorUsedError;
-  String get date => throw _privateConstructorUsedError;
+  DateTime get date => throw _privateConstructorUsedError;
   int get scheduledStartTime => throw _privateConstructorUsedError;
   int get scheduledEndTime => throw _privateConstructorUsedError;
   int get userId => throw _privateConstructorUsedError;
@@ -39,7 +39,7 @@ abstract class $WorkCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String date,
+      DateTime date,
       int scheduledStartTime,
       int scheduledEndTime,
       int userId,
@@ -74,7 +74,7 @@ class _$WorkCopyWithImpl<$Res, $Val extends Work>
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
       scheduledStartTime: null == scheduledStartTime
           ? _value.scheduledStartTime
           : scheduledStartTime // ignore: cast_nullable_to_non_nullable
@@ -104,7 +104,7 @@ abstract class _$$WorkImplCopyWith<$Res> implements $WorkCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      String date,
+      DateTime date,
       int scheduledStartTime,
       int scheduledEndTime,
       int userId,
@@ -136,7 +136,7 @@ class __$$WorkImplCopyWithImpl<$Res>
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
       scheduledStartTime: null == scheduledStartTime
           ? _value.scheduledStartTime
           : scheduledStartTime // ignore: cast_nullable_to_non_nullable
@@ -174,7 +174,7 @@ class _$WorkImpl implements _Work {
   @override
   final String id;
   @override
-  final String date;
+  final DateTime date;
   @override
   final int scheduledStartTime;
   @override
@@ -227,7 +227,7 @@ class _$WorkImpl implements _Work {
 abstract class _Work implements Work {
   factory _Work(
       {required final String id,
-      required final String date,
+      required final DateTime date,
       required final int scheduledStartTime,
       required final int scheduledEndTime,
       required final int userId,
@@ -238,7 +238,7 @@ abstract class _Work implements Work {
   @override
   String get id;
   @override
-  String get date;
+  DateTime get date;
   @override
   int get scheduledStartTime;
   @override

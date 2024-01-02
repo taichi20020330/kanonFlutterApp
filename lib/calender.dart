@@ -3,20 +3,45 @@
 
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:kanon_app/enum.dart';
+import 'package:kanon_app/provider.dart';
+import 'package:kanon_app/work.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'utils.dart';
 
+class TableEventsExample extends ConsumerStatefulWidget {
+  const TableEventsExample({super.key});
 
-class TableEventsExample extends StatefulWidget {
   @override
   _TableEventsExampleState createState() => _TableEventsExampleState();
 }
 
-class _TableEventsExampleState extends State<TableEventsExample> {
+class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
+  @override
+  void initState() {
+    super.initState();
+    // "ref" can be used in all life-cycles of a StatefulWidget.
+    _selectedDay = _focusedDay;
+    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+
+    ref.read(worksProvider);
+  }
+
+  @override
+  void dispose() {
+    _selectedEvents.dispose();
+    super.dispose();
+  }
+
   late final ValueNotifier<List<Event>> _selectedEvents;
+  List<Map<String, dynamic>> scheduleList = [];
+  List<Work> previousWorks = [];
+
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
@@ -26,68 +51,28 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   DateTime? _rangeEnd;
 
   @override
-  void initState() {
-    super.initState();
-
-    _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-  }
-
-  @override
-  void dispose() {
-    _selectedEvents.dispose();
-    super.dispose();
-  }
-
-  List<Event> _getEventsForDay(DateTime day) {
-    // Implementation example
-    return kEvents[day] ?? [];
-  }
-
-  List<Event> _getEventsForRange(DateTime start, DateTime end) {
-    // Implementation example
-    final days = daysInRange(start, end);
-
-    return [
-      for (final d in days) ..._getEventsForDay(d),
-    ];
-  }
-
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if (!isSameDay(_selectedDay, selectedDay)) {
-      setState(() {
-        _selectedDay = selectedDay;
-        _focusedDay = focusedDay;
-        _rangeStart = null; // Important to clean those
-        _rangeEnd = null;
-        _rangeSelectionMode = RangeSelectionMode.toggledOff;
-      });
-
-      _selectedEvents.value = _getEventsForDay(selectedDay);
-    }
-  }
-
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = null;
-      _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-      _rangeSelectionMode = RangeSelectionMode.toggledOn;
-    });
-
-    // `start` or `end` could be null
-    if (start != null && end != null) {
-      _selectedEvents.value = _getEventsForRange(start, end);
-    } else if (start != null) {
-      _selectedEvents.value = _getEventsForDay(start);
-    } else if (end != null) {
-      _selectedEvents.value = _getEventsForDay(end);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final AsyncValue<List<Work>> works = ref.watch(worksProvider);
+
+    works.when(
+      data: (worksList) {
+        if (!listEquals(worksList, previousWorks)) {
+          for (var work in worksList) {
+            String title = '${convertUserIdToUserName(work.userId)} '
+                ' ${convertToTimeFormat(work.scheduledStartTime)}';
+            scheduleList.add({
+              'datetime': work.date,
+              'title': title,
+            });
+          }
+        }
+        previousWorks = worksList;
+      },
+      loading: () => const CircularProgressIndicator(),
+      error: (error, stackTrace) => Text('Error: $error'),
+    );
+    _addEventFromList(scheduleList);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('TableCalendar - Events'),
@@ -151,6 +136,106 @@ class _TableEventsExampleState extends State<TableEventsExample> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // worksProviderから取得したデータをscheduleListに変換する
+
+          _addEventFromList(scheduleList);
+        },
+        child: Icon(Icons.add),
+      ),
     );
+  }
+
+  List<Event> _getEventsForDay(DateTime day) {
+    // Implementation example
+    return kEvents[day] ?? [];
+  }
+
+  List<Event> _getEventsForRange(DateTime start, DateTime end) {
+    // Implementation example
+    final days = daysInRange(start, end);
+
+    return [
+      for (final d in days) ..._getEventsForDay(d),
+    ];
+  }
+
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    if (!isSameDay(_selectedDay, selectedDay)) {
+      setState(() {
+        _selectedDay = selectedDay;
+        _focusedDay = focusedDay;
+        _rangeStart = null; // Important to clean those
+        _rangeEnd = null;
+        _rangeSelectionMode = RangeSelectionMode.toggledOff;
+      });
+
+      _selectedEvents.value = _getEventsForDay(selectedDay);
+    }
+  }
+
+  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
+    setState(() {
+      _selectedDay = null;
+      _focusedDay = focusedDay;
+      _rangeStart = start;
+      _rangeEnd = end;
+      _rangeSelectionMode = RangeSelectionMode.toggledOn;
+    });
+
+    // `start` or `end` could be null
+    if (start != null && end != null) {
+      _selectedEvents.value = _getEventsForRange(start, end);
+    } else if (start != null) {
+      _selectedEvents.value = _getEventsForDay(start);
+    } else if (end != null) {
+      _selectedEvents.value = _getEventsForDay(end);
+    }
+  }
+
+  void _addEventFromList(List<Map<String, dynamic>> scheduleList) {
+    for (var schedule in scheduleList) {
+      final date = schedule['datetime'] as DateTime?;
+      final title = schedule['title'] as String?;
+
+      if (date != null && title != null) {
+        // Check if the event with the same date and title already exists
+        final existingEvents = kEvents[date] ?? [];
+        final isDuplicate = existingEvents.any((event) => event.title == title);
+
+        if (!isDuplicate) {
+          // If not a duplicate, add the event
+          final event = Event(title);
+          kEvents[date] = [...existingEvents, event];
+        }
+      }
+    }
+    // Update selected events
+    // _selectedEvents.value = _getEventsForDay(_selectedDay!);
+  }
+
+  String convertUserIdToUserName(int id) {
+    // simpleUserNameListのid番目の要素を返す
+    return simpleUserNameList[id];
+  }
+
+  String convertToTimeFormat(int input) {
+    // 桁数が足りない場合はエラーとしてnullを返す
+    if (input < 100 || input > 2359) {
+      return "";
+    }
+
+    // 入力された数字から時と分を取得
+    int hour = input ~/ 100;
+    int minute = input % 100;
+
+    // 時と分が適切な範囲か確認
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      return "";
+    }
+
+    // 時間と分をフォーマットして返す
+    return '${hour.toString()}:${minute.toString().padLeft(2, '0')}';
   }
 }
