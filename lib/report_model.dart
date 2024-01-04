@@ -1,65 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod/riverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'report.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-const _uuid = Uuid();
+class ReportModel extends ChangeNotifier {
+  List<Report> reports = [];
 
+  Future<List<Report>> fetchReports() async {
+    final docs = await FirebaseFirestore.instance.collection('reports').get();
+    final reports = docs.docs.map((doc) {
+      Timestamp startTime = doc['startTime'];
+      Timestamp endTime = doc['endTime'];
+      Timestamp roundUpEndTime = doc['roundUpEndTime'];
+      Timestamp date = doc['date'];
+      return Report(
+          startTime: startTime.toDate(),
+          endTime: endTime.toDate(),
+          roundUpEndTime: roundUpEndTime.toDate(),
+          fee: doc['fee'],
+          user: doc['user'],
+          description: doc['description'],
+          date: date.toDate(),
+          id: doc.id);
+    }).toList();
+    this.reports = reports;
+    return reports;
+  }
 
-class ReportModel extends Notifier<List<Report>> {
-  @override
-  List<Report> build() => [
-        Report(
-          startTime: TimeOfDay(hour: 9, minute: 0),
-          endTime: TimeOfDay(hour: 17, minute: 0),
-          roundUpEndTime: roundTimeToNearest15Minutes(TimeOfDay(hour: 17, minute: 13)),
-          fee: 500,
-          user: 1,
-          date: DateTime(2021, 10, 1), 
-          id: _uuid.v4(),
-        ),
-      ];
-
-  void addReport(DateTime date, TimeOfDay startTime, TimeOfDay endTime,
-      int? fee, String? description, int user) {
-    state = [
-      ...state,
-      Report(
-        id: _uuid.v4(),
-        startTime: startTime,
-        endTime: endTime,
-        roundUpEndTime: roundTimeToNearest15Minutes(endTime),
-        fee: fee,
-        user: user,
-        description: description,
-        date: date,
-      )
-    ];
+  void addReport(DateTime date, DateTime startTime, DateTime endTime, int? fee,
+      String? description, int user) async {
+    await FirebaseFirestore.instance
+        .collection('reports') // コレクションID指定
+        .doc() // ドキュメントID自動生成
+        .set({
+      'startTime': startTime,
+      'endTime': endTime,
+      'roundUpEndTime': roundTimeToNearest15Minutes(endTime),
+      'fee': fee,
+      'user': user,
+      'description': description,
+      'date': date,
+    });
   }
 
   void removeReport(Report report) {
-    state = state.where((element) => element.id != report.id).toList();
+    // state = state.where((element) => element.id != report.id).toList();
   }
 
   void updateReport(Report report) {
-    state = [
-      for (final r in state)
-        if (r.id == report.id) report else r
-    ];
+    // state = [
+    //   for (final r in state)
+    //     if (r.id == report.id) report else r
+    // ];
   }
 
-  TimeOfDay roundTimeToNearest15Minutes(TimeOfDay time) {
-  int minutes = time.hour * 60 + time.minute;
-  if (minutes % 15 == 0) {
-    // 指定された時間が15分単位で既に整っている場合はそのまま返す
-    return time;
-  } else {
-    int roundedMinutes = ((minutes + 7.5) / 15).round() * 15;
-    if (roundedMinutes >= 60) {
-      roundedMinutes -= 60;
+  DateTime roundTimeToNearest15Minutes(DateTime time) {
+    int minutes = time.hour * 60 + time.minute;
+    if (minutes % 15 == 0) {
+      // 指定された時間が15分単位で既に整っている場合はそのまま返す
+      return time;
+    } else {
+      int roundedMinutes = ((minutes + 7.5) / 15).round() * 15;
+      if (roundedMinutes >= 60) {
+        roundedMinutes -= 60;
+      }
+      return DateTime(time.year, time.month, time.day, roundedMinutes ~/ 60,
+          roundedMinutes % 60);
     }
-    return TimeOfDay(hour: roundedMinutes ~/ 60, minute: roundedMinutes % 60);
   }
-}
-
 }

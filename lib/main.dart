@@ -11,7 +11,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 final reportListProvider =
-    NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
+    // NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
+    ChangeNotifierProvider((ref) => ReportModel());
 
 void main() async {
   //追記するコード
@@ -53,60 +54,87 @@ class Home extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reports = ref.watch(reportListProvider);
-    List<Report> sortedReports = reports.toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+    // final reports = ref.watch(reportListProvider).reports;
 
-    Map<String, List<Report>> groupedReports =
-        groupReportsByMonth(sortedReports);
+    // List<Report> sortedReports = reports
+    //   ..sort((a, b) => a.date.compareTo(b.date));
 
-    return DefaultTabController(
-      length: groupedReports.keys.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('かのん介護'),
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: groupedReports.keys
-                .map((String month) => Tab(
-                      text: month,
-                    ))
-                .toList(),
-          ),
-        ),
-        body: TabBarView(
-          children: groupedReports.entries.map((entry) {
-            List<Report> sortedReports = entry.value.toList()
-              ..sort((a, b) => a.date.compareTo(b.date));
-            Duration totalWorkTime = calculateTotalWorkTime(sortedReports);
-            double monthlySalary = calculateMonthlySalary(totalWorkTime);
+    // Map<String, List<Report>> groupedReports =
+    //     groupReportsByMonth(sortedReports);
 
-            return ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              children: [
-                WorkTimeText(totalWorkTime),
-                SalaryText(monthlySalary),
-                for (var report in sortedReports) ...[
-                  if (sortedReports.indexOf(report) > 0)
-                    const Divider(height: 0),
-                  ProviderScope(
-                    overrides: [
-                      _currentReport.overrideWithValue(report),
-                    ],
-                    child: const ReportItem(),
+    // Future<List<Report>> _data = ref.watch(reportListProvider).fetchReports();
+
+    return FutureBuilder<List<Report>>(
+        future: ref.watch(reportListProvider).fetchReports(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // データ取得中の表示など、ローディング表示を追加することができます
+            return const CircularProgressIndicator(); // 例: ローディング中のインジケーター
+          } else if (snapshot.hasError) {
+            // エラーが発生した場合の表示
+            return Text('Error: ${snapshot.error}');
+          } else {
+            final reports = snapshot.data!;
+
+            List<Report> sortedReports = reports
+              ..sort((Report a, Report b) => a.date.compareTo(b.date));
+
+            Map<String, List<Report>> groupedReports =
+                groupReportsByMonth(sortedReports);
+
+            return DefaultTabController(
+              length: groupedReports.keys.length,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: const Text('かのん介護'),
+                  bottom: TabBar(
+                    isScrollable: true,
+                    tabs: groupedReports.keys
+                        .map((String month) => Tab(
+                              text: month,
+                            ))
+                        .toList(),
                   ),
-                ],
-              ],
+                ),
+                body: TabBarView(
+                  children: groupedReports.entries.map((entry) {
+                    List<Report> sortedReports = entry.value.toList()
+                      ..sort((a, b) => a.date.compareTo(b.date));
+                    Duration totalWorkTime =
+                        calculateTotalWorkTime(sortedReports);
+                    double monthlySalary =
+                        calculateMonthlySalary(totalWorkTime);
+
+                    return ListView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 40),
+                      children: [
+                        WorkTimeText(totalWorkTime),
+                        SalaryText(monthlySalary),
+                        for (var report in sortedReports) ...[
+                          if (sortedReports.indexOf(report) > 0)
+                            const Divider(height: 0),
+                          ProviderScope(
+                            overrides: [
+                              _currentReport.overrideWithValue(report),
+                            ],
+                            child: const ReportItem(),
+                          ),
+                        ],
+                      ],
+                    );
+                  }).toList(),
+                ),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () =>
+                      _openFormPage(context, OpenFormPageMode.add, null),
+                  tooltip: 'Increment',
+                  child: const Icon(Icons.add),
+                ),
+              ),
             );
-          }).toList(),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _openFormPage(context, OpenFormPageMode.add, null),
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
+          }
+        });
   }
 
   WorkTimeText(Duration totalWorkTime) {
@@ -177,7 +205,7 @@ class ReportItem extends HookConsumerWidget {
             selectUser(report.user),
           ),
           subtitle: Text(
-              '$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
+              '$formattedDate ${formatTime(TimeOfDay(hour: report.startTime.hour, minute: report.startTime.minute))} ~ ${formatTime(TimeOfDay(hour: report.endTime.hour, minute: report.endTime.minute))}'),
           trailing: const CardMenuTrailing(),
         ),
       ),

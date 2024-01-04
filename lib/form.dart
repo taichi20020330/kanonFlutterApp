@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,8 +32,8 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
   double maxValue = 0;
   bool? brushedTeeth = false;
   bool enableFeature = false;
-  TimeOfDay? startTime = TimeOfDay.now();
-  TimeOfDay? endTime = TimeOfDay.now();
+  DateTime? startTime = DateTime.now();
+  DateTime? endTime = DateTime.now();
   ReportModel reportModel = ReportModel();
   Report? currentReport;
   late OpenFormPageMode mode;
@@ -59,8 +58,6 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
 
   @override
   Widget build(BuildContext context) {
-    final reports = ref.watch(reportListProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('仕事の記録'),
@@ -116,7 +113,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
   }
 
   TimeSelectButton(BuildContext context, TimeSelectButtonMode mode) {
-    TimeOfDay? selectTime;
+    DateTime? selectTime;
     TimeLabel timeLabel;
     if (mode == TimeSelectButtonMode.startTimeMode) {
       selectTime = startTime;
@@ -209,16 +206,6 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
   _comfirmForm(BuildContext context) async {
     ref.read(reportListProvider.notifier).addReport(
         date, startTime!, endTime!, fee, description, selectedUser!.index);
-
-    await FirebaseFirestore.instance
-        .collection('reports') // コレクションID指定
-        .doc() // ドキュメントID自動生成
-        .set({
-      'id': selectedUser.label,
-      'startTime': startTime.toString(),
-      'endTime': endTime.toString(),
-      'fee': fee
-    });
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),
@@ -241,7 +228,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
       );
       if (picked != null && picked != startTime) {
         setState(() {
-          startTime = picked;
+          startTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
         });
       }
     } else {
@@ -257,7 +244,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
       );
       if (picked != null && picked != endTime) {
         setState(() {
-          endTime = picked;
+          endTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
         });
       }
     }
