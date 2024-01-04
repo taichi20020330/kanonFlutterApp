@@ -43,7 +43,7 @@ class ReportModel extends ChangeNotifier {
   }
 
   void removeReport(Report report) {
-    // state = state.where((element) => element.id != report.id).toList();
+    FirebaseFirestore.instance.collection('reports').doc(report.id).delete();
   }
 
   void updateReport(Report report) {
