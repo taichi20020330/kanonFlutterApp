@@ -1,0 +1,89 @@
+
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.javaÏ
+,io.flutter.plugins.GeneratedPluginRegistrantCLASSU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (,"
+packageio.flutter.plugins"
+isFinaltrue"
+inner classfalse"
+
+isAbstractfalse"Æ
+declarationString°<mark class="annotation">@Keep</mark> <br><mark class="modifier">public </mark><mark class="modifier">final </mark><mark class="modifier">class </mark>GeneratedPluginRegistrant"
+accesspublic*GeneratedPluginRegistrant2Ê
+dio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)DECLARATIONU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (!2¢
+<io.flutter.plugins.GeneratedPluginRegistrant?TAG@15.30:15.33DECLARATIONU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (!Ì
+dio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)METHODU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (!"
+isFinalfalse"ñ
+declarationStringÛ<mark class="modifier">public </mark><mark class="modifier">static </mark><mark class="modifier">void</mark> <mark class="method">registerWith</mark>(<mark class="annotation">@NonNull</mark> FlutterEngine flutterEngine)"
+isStatictrue"
+accesspublic"
+
+isAbstractfalse"
+typevoid*registerWith2Ñ
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)!flutterEngineCALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2›
+<io.flutter.plugins.GeneratedPluginRegistrant?TAG@15.30:15.33CALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2Ó
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@19.23:19.24CALLW
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java‚ (ƒ2Ñ
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)!flutterEngineCALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2›
+<io.flutter.plugins.GeneratedPluginRegistrant?TAG@15.30:15.33CALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2Ñ
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@24.23:24.24CALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.javax (y2Ñ
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)!flutterEngineCALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2›
+<io.flutter.plugins.GeneratedPluginRegistrant?TAG@15.30:15.33CALLU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2Ó
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@29.23:29.24CALLW
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java† (‡2Ö
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)!flutterEngine	PARAMETERU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java9 (F2Ø
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@19.23:19.24DECLARATIONU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2Ø
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@24.23:24.24DECLARATIONU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2Ø
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@29.23:29.24DECLARATIONU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (2j
+voidRETURN_TYPEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (ô
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)!flutterEngine	PARAMETERU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java9 (F"
+typeFlutterEngine"
+isFinalfalse"Y
+declarationStringD<mark class="annotation">@NonNull</mark> FlutterEngine flutterEngine*flutterEngine2ˆ
+)io.flutter.embedding.engine.FlutterEngineTYPEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java+ (8“
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@19.23:19.24VARIABLEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java ("
+type	Exception"
+isFinalfalse" 
+declarationStringException e*e2r
+java.lang.ExceptionTYPEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (“
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@24.23:24.24VARIABLEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java ("
+type	Exception"
+isFinalfalse" 
+declarationStringException e*e2r
+java.lang.ExceptionTYPEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (“
+rio.flutter.plugins.GeneratedPluginRegistrant.registerWith(io.flutter.embedding.engine.FlutterEngine)?e@29.23:29.24VARIABLEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java ("
+type	Exception"
+isFinalfalse" 
+declarationStringException e*e2r
+java.lang.ExceptionTYPEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (ª
+<io.flutter.plugins.GeneratedPluginRegistrant?TAG@15.30:15.33VALUEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (!"
+isFinaltrue"
+typeString"Ï
+declarationString¹<mark class="modifier">private </mark><mark class="modifier">static </mark><mark class="modifier">final </mark>String <mark class="class-field">TAG</mark> = "GeneratedPluginRegistrant";"
+isStatictrue"
+accessprivate*TAG2o
+java.lang.StringTYPEU
+Kandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java (
