@@ -218,7 +218,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
         const SnackBar(content: Text('Processing Data')),
       );
     }
-    Navigator.pop;
+    Navigator.pop(context);
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {

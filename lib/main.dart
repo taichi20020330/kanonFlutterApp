@@ -52,8 +52,8 @@ class Home extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder<List<Report>>(
-        future: ref.watch(reportListProvider).fetchReports(),
+    return StreamBuilder<List<Report>>(
+        stream: ref.watch(reportListProvider).fetchReports(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // データ取得中の表示など、ローディング表示を追加することができます

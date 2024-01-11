@@ -5,25 +5,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ReportModel extends ChangeNotifier {
   List<Report> reports = [];
 
-  Future<List<Report>> fetchReports() async {
-    final docs = await FirebaseFirestore.instance.collection('reports').get();
-    final reports = docs.docs.map((doc) {
-      Timestamp startTime = doc['startTime'];
-      Timestamp endTime = doc['endTime'];
-      Timestamp roundUpEndTime = doc['roundUpEndTime'];
-      Timestamp date = doc['date'];
-      return Report(
-          startTime: startTime.toDate(),
-          endTime: endTime.toDate(),
-          roundUpEndTime: roundUpEndTime.toDate(),
-          fee: doc['fee'],
-          user: doc['user'],
-          description: doc['description'],
-          date: date.toDate(),
-          id: doc.id);
-    }).toList();
-    this.reports = reports;
-    return reports;
+  // Future<List<Report>> fetchReports() async {
+  //   final docs = await FirebaseFirestore.instance.collection('reports').get();
+  Stream<List<Report>> fetchReports() {
+    final stream = FirebaseFirestore.instance.collection('reports').snapshots();
+    return stream.map((snapshot) => snapshot.docs
+        .map((doc) => Report(
+            startTime: doc['startTime'].toDate(),
+            endTime: doc['endTime'].toDate(),
+            roundUpEndTime: doc['roundUpEndTime'].toDate(),
+            fee: doc['fee'],
+            user: doc['user'],
+            description: doc['description'],
+            date: doc['date'].toDate(),
+            id: doc.id))
+        .toList());
+    // final docs = await FirebaseFirestore.instance.collection('reports').get();
+    // final reports = docs.docs.map((doc) {
+    //   Timestamp startTime = doc['startTime'];
+    //   Timestamp endTime = doc['endTime'];
+    //   Timestamp roundUpEndTime = doc['roundUpEndTime'];
+    //   Timestamp date = doc['date'];
+    //   return Report(
+    //       startTime: startTime.toDate(),
+    //       endTime: endTime.toDate(),
+    //       roundUpEndTime: roundUpEndTime.toDate(),
+    //       fee: doc['fee'],
+    //       user: doc['user'],
+    //       description: doc['description'],
+    //       date: date.toDate(),
+    //       id: doc.id);
+    // }).toList();
+    // this.reports = reports;
+    // return reports;
   }
 
   void addReport(DateTime date, DateTime startTime, DateTime endTime, int? fee,
