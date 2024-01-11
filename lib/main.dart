@@ -10,9 +10,7 @@ import 'package:kanon_app/report_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-final reportListProvider =
-    // NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
-    ChangeNotifierProvider((ref) => ReportModel());
+final reportListProvider = ChangeNotifierProvider((ref) => ReportModel());
 
 void main() async {
   //追記するコード
@@ -54,16 +52,6 @@ class Home extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final reports = ref.watch(reportListProvider).reports;
-
-    // List<Report> sortedReports = reports
-    //   ..sort((a, b) => a.date.compareTo(b.date));
-
-    // Map<String, List<Report>> groupedReports =
-    //     groupReportsByMonth(sortedReports);
-
-    // Future<List<Report>> _data = ref.watch(reportListProvider).fetchReports();
-
     return FutureBuilder<List<Report>>(
         future: ref.watch(reportListProvider).fetchReports(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {

@@ -89,7 +89,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
                             context, TimeSelectButtonMode.startTimeMode),
                         TimeSelectButton(
                             context, TimeSelectButtonMode.endTimeMode),
-                        UserLabelButton(),
+                        UserLabelButton(selectedUser),
                         FeeTextField(),
                         DescriptionTextField(),
                         RegisterButton(),
@@ -137,9 +137,9 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
     );
   }
 
-  UserLabelButton() {
+  UserLabelButton(UserLabel? initialUser) {
     return DropdownMenu<UserLabel>(
-      initialSelection: UserLabel.user0,
+      initialSelection: initialUser ?? UserLabel.user0,
       controller: userController,
       // requestFocusOnTap is enabled/disabled by platforms when it is null.
       // On mobile platforms, this is false by default. Setting this to true will
@@ -174,6 +174,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
 
   FeeTextField() {
     return TextField(
+      controller: TextEditingController(text: fee.toString()),
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
       decoration: const InputDecoration(
@@ -190,6 +191,7 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
 
   DescriptionTextField() {
     return TextFormField(
+      initialValue: description,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         filled: true,
@@ -204,14 +206,19 @@ class FormWidgetsDemoState extends ConsumerState<FormWidgetsDemo> {
   }
 
   _comfirmForm(BuildContext context) async {
-    ref.read(reportListProvider.notifier).addReport(
-        date, startTime!, endTime!, fee, description, selectedUser!.index);
+    if (mode.name == "add") {
+      ref.read(reportListProvider.notifier).addReport(
+          date, startTime!, endTime!, fee, description, selectedUser!.index);
+    } else if (mode.name == "edit") {
+      ref.read(reportListProvider.notifier).updateReport(currentReport!.id,
+          date, startTime!, endTime!, fee, description, selectedUser!.index);
+    }
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),
       );
     }
-    Navigator.pop(context);
+    Navigator.pop;
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {
