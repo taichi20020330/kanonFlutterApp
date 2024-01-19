@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
       locale: Locale('ja'),
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: Home(),
+      home: BottomNavigationPage(),
     );
   }
 }

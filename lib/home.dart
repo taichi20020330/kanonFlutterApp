@@ -14,8 +14,6 @@ import 'package:kanon_app/work.dart';
 final reportListProvider =
     // NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
     ChangeNotifierProvider((ref) => ReportModel());
-    final pageProvider = NotifierProvider<PageNotifier, PageType>(PageNotifier.new);
-
 
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
