@@ -136,14 +136,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // worksProviderから取得したデータをscheduleListに変換する
-
-          _addEventFromList(scheduleList);
-        },
-        child: Icon(Icons.add),
-      ),
     );
   }
 

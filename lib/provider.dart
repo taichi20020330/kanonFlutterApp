@@ -10,7 +10,7 @@ part 'provider.g.dart';
 @riverpod
 Future<List<Work>> works(WorksRef ref) async {
   // Using package:http, we fetch a random activity from the Bored API.
-  final response = await http.get(Uri.https('api.sssapi.app', 'h6y_ywkD7tbejTS7XcDLT'));
+  final response = await http.get(Uri.https('api.sssapi.app', 'un4YOrTFzJOmeag_VJlNs'));
   // Using dart:convert, we then decode the JSON payload into a Map data structure.
   List<dynamic> jsonList = jsonDecode(response.body);
   List<Work> works = jsonList.map((json) {
