@@ -7,12 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:kanon_app/enum.dart';
-import 'package:kanon_app/provider.dart';
-import 'package:kanon_app/work.dart';
+import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/data/provider.dart';
+import 'package:kanon_app/data/work.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'utils.dart';
+import '../data/utils.dart';
 
 class TableEventsExample extends ConsumerStatefulWidget {
   const TableEventsExample({super.key});

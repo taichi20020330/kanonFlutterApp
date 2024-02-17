@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kanon_app/data/report.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
-import 'report.dart';
 
 const _uuid = Uuid();
 
