@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/work.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+part 'work_model.g.dart';
 
 class WorkModel extends Notifier<List<Work>> {
   @override
@@ -19,7 +19,7 @@ Future<List<Work>> works(WorksRef ref) async {
   List<dynamic> jsonList = jsonDecode(response.body);
   List<Work> works = jsonList.map((json) {
       // Use parseJapaneseDate to convert the date string to DateTime.
-      DateTime parsedDate = parseJapaneseDate(json['date'] as String);
+      String parsedDate = parseJapaneseDate(json['date'] as String);
       
       // Create a Work object with the parsed DateTime.
       return Work.fromJson({
@@ -30,14 +30,15 @@ Future<List<Work>> works(WorksRef ref) async {
   return works;
 }
 
-DateTime parseJapaneseDate(String dateString) {
+String parseJapaneseDate(String dateString) {
   List<String> parts = dateString.split('/');
   if (parts.length == 3) {
     int year = int.parse(parts[0]);
     int month = int.parse(parts[1]);
     int day = int.parse(parts[2]);
+    String date = DateTime(year, month, day).toString();
     
-    return DateTime(year, month, day);
+    return date;
   } else {
     throw FormatException("Invalid date format: $dateString");
   }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kanon_app/provider.dart';
-import 'package:kanon_app/work.dart';
+import 'package:kanon_app/%20model/work_model.dart';
+import 'package:kanon_app/data/provider.dart';
+import 'package:kanon_app/data/work.dart';
 
 class ScheduleListPage extends HookConsumerWidget {
   const ScheduleListPage({Key? key}) : super(key: key);

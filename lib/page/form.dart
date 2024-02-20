@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:kanon_app/enum.dart';
+import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/main.dart';
-import 'package:kanon_app/report.dart';
-import 'package:kanon_app/report_model.dart';
+import 'package:kanon_app/data/report.dart';
+import 'package:kanon_app/%20model/report_model.dart';
 
 class FormPage extends ConsumerStatefulWidget {
   FormPage({required this.mode, this.currentReport, super.key});

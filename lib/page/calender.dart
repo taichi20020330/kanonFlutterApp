@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:kanon_app/%20model/work_model.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/work.dart';
@@ -38,9 +39,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     super.dispose();
   }
 
-  late final ValueNotifier<List<Event>> _selectedEvents;
-  List<Map<String, dynamic>> scheduleList = [];
-  List<Work> previousWorks = [];
+  late final ValueNotifier<List<Work>> _selectedEvents;
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
@@ -56,22 +55,33 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
     works.when(
       data: (worksList) {
-        if (!listEquals(worksList, previousWorks)) {
-          for (var work in worksList) {
-            String title = '${convertUserIdToUserName(work.userId)} '
-                ' ${convertToTimeFormat(work.scheduledStartTime)}';
-            scheduleList.add({
-              'datetime': work.date,
-              'title': title,
-            });
+        // if (!listEquals(worksList, previousWorks)) {
+        //   for (var work in worksList) {
+        //     String title = '${convertUserIdToUserName(work.userId)} '
+        //         ' ${convertToTimeFormat(work.scheduledStartTime)}';
+        //     scheduleList.add({
+        //       'datetime': work.date,
+        //       'title': title,
+        //     });
+        //   }
+        // }
+        // previousWorks = worksList;
+        for (var work in worksList) {
+          final date = work.date;
+          final id = work.id;
+
+          // Check if the event with the same date and title already exists
+          final existingEvents = kEvents[date] ?? [];
+          final isDuplicate = existingEvents.any((work) => work.id == id);
+
+          if (!isDuplicate) {
+            kEvents[date] = [...existingEvents, work];
           }
         }
-        previousWorks = worksList;
       },
       loading: () => const CircularProgressIndicator(),
       error: (error, stackTrace) => Text('Error: $error'),
     );
-    _addEventFromList(scheduleList);
 
     return Scaffold(
       appBar: AppBar(
@@ -79,7 +89,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       ),
       body: Column(
         children: [
-          TableCalendar<Event>(
+          TableCalendar<Work>(
             firstDay: kFirstDay,
             lastDay: kLastDay,
             focusedDay: _focusedDay,
@@ -109,7 +119,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
           ),
           const SizedBox(height: 8.0),
           Expanded(
-            child: ValueListenableBuilder<List<Event>>(
+            child: ValueListenableBuilder<List<Work>>(
               valueListenable: _selectedEvents,
               builder: (context, value, _) {
                 return ListView.builder(
@@ -139,12 +149,12 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     );
   }
 
-  List<Event> _getEventsForDay(DateTime day) {
+  List<Work> _getEventsForDay(DateTime day) {
     // Implementation example
     return kEvents[day] ?? [];
   }
 
-  List<Event> _getEventsForRange(DateTime start, DateTime end) {
+  List<Work> _getEventsForRange(DateTime start, DateTime end) {
     // Implementation example
     final days = daysInRange(start, end);
 
@@ -184,50 +194,5 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     } else if (end != null) {
       _selectedEvents.value = _getEventsForDay(end);
     }
-  }
-
-  void _addEventFromList(List<Map<String, dynamic>> scheduleList) {
-    for (var schedule in scheduleList) {
-      final date = schedule['datetime'] as DateTime?;
-      final title = schedule['title'] as String?;
-
-      if (date != null && title != null) {
-        // Check if the event with the same date and title already exists
-        final existingEvents = kEvents[date] ?? [];
-        final isDuplicate = existingEvents.any((event) => event.title == title);
-
-        if (!isDuplicate) {
-          // If not a duplicate, add the event
-          final event = Event(title);
-          kEvents[date] = [...existingEvents, event];
-        }
-      }
-    }
-    // Update selected events
-    // _selectedEvents.value = _getEventsForDay(_selectedDay!);
-  }
-
-  String convertUserIdToUserName(int id) {
-    // simpleUserNameListのid番目の要素を返す
-    return simpleUserNameList[id];
-  }
-
-  String convertToTimeFormat(int input) {
-    // 桁数が足りない場合はエラーとしてnullを返す
-    if (input < 100 || input > 2359) {
-      return "";
-    }
-
-    // 入力された数字から時と分を取得
-    int hour = input ~/ 100;
-    int minute = input % 100;
-
-    // 時と分が適切な範囲か確認
-    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-      return "";
-    }
-
-    // 時間と分をフォーマットして返す
-    return '${hour.toString()}:${minute.toString().padLeft(2, '0')}';
   }
 }

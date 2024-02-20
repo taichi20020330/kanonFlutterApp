@@ -5,7 +5,7 @@ import 'package:kanon_app/page/calender.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/page/form.dart';
 import 'package:kanon_app/page/home.dart';
-import 'package:kanon_app/page/main.dart';
+import 'package:kanon_app/main.dart';
 import 'package:kanon_app/page/schedule_list_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 

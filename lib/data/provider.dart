@@ -6,9 +6,6 @@ import 'package:kanon_app/data/work.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
-part 'provider.g.dart';
-
-
 
 class PageNotifier extends Notifier<PageType> {
   

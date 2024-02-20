@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:kanon_app/bottom_navigation.dart';
-import 'package:kanon_app/enum.dart';
-import 'package:kanon_app/provider.dart';
-import 'package:kanon_app/report.dart';
-import 'package:kanon_app/report_model.dart';
+import 'package:kanon_app/module/bottom_navigation.dart';
+import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/data/provider.dart';
+import 'package:kanon_app/data/report.dart';
+import 'package:kanon_app/%20model/report_model.dart';
 // import 'package:flutter_hooks/flutter_hooks.dart';
 
 final reportListProvider =
