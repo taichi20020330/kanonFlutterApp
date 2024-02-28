@@ -32,8 +32,8 @@ class FormPageState extends ConsumerState<FormPage> {
   double maxValue = 0;
   bool? brushedTeeth = false;
   bool enableFeature = false;
-  TimeOfDay? startTime = TimeOfDay.now();
-  TimeOfDay? endTime = TimeOfDay.now();
+  DateTime? startTime = DateTime.now();
+  DateTime? endTime = DateTime.now();
   ReportModel reportModel = ReportModel();
   Report? currentReport;
   late OpenFormPageMode mode;
@@ -58,8 +58,6 @@ class FormPageState extends ConsumerState<FormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final reports = ref.watch(reportListProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('仕事の記録'),
@@ -95,7 +93,6 @@ class FormPageState extends ConsumerState<FormPage> {
                         FeeTextField(),
                         DescriptionTextField(),
                         RegisterButton(),
-                      
                       ].expand(
                         (widget) => [
                           widget,
@@ -115,10 +112,8 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  
-
   TimeSelectButton(BuildContext context, TimeSelectButtonMode mode) {
-    TimeOfDay? selectTime;
+    DateTime? selectTime;
     TimeLabel timeLabel;
     if (mode == TimeSelectButtonMode.startTimeMode) {
       selectTime = startTime;
@@ -208,10 +203,9 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  _comfirmForm(BuildContext context) {
+  _comfirmForm(BuildContext context) async {
     ref.read(reportListProvider.notifier).addReport(
         date, startTime!, endTime!, fee, description, selectedUser!.index);
-
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),
@@ -234,7 +228,7 @@ class FormPageState extends ConsumerState<FormPage> {
       );
       if (picked != null && picked != startTime) {
         setState(() {
-          startTime = picked;
+          startTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
         });
       }
     } else {
@@ -250,7 +244,7 @@ class FormPageState extends ConsumerState<FormPage> {
       );
       if (picked != null && picked != endTime) {
         setState(() {
-          endTime = picked;
+          endTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
         });
       }
     }
