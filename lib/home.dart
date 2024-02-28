@@ -71,23 +71,28 @@ class Home extends HookConsumerWidget {
                     double monthlySalary =
                         calculateMonthlySalary(totalWorkTime);
 
-                    return ListView(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 40),
-                      children: [
-                        WorkTimeText(totalWorkTime),
-                        SalaryText(monthlySalary),
-                        for (var report in sortedReports) ...[
-                          if (sortedReports.indexOf(report) > 0)
-                            const Divider(height: 0),
-                          ProviderScope(
-                            overrides: [
-                              _currentReport.overrideWithValue(report),
-                            ],
-                            child: const ReportItem(),
-                          ),
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await ref.watch(reportListProvider).fetchReports();
+                      },
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 40),
+                        children: [
+                          WorkTimeText(totalWorkTime),
+                          SalaryText(monthlySalary),
+                          for (var report in sortedReports) ...[
+                            if (sortedReports.indexOf(report) > 0)
+                              const Divider(height: 0),
+                            ProviderScope(
+                              overrides: [
+                                _currentReport.overrideWithValue(report),
+                              ],
+                              child: const ReportItem(),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     );
                   }).toList(),
                 ),

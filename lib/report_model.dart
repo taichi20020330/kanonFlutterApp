@@ -68,5 +68,10 @@ class ReportModel extends ChangeNotifier {
           roundedMinutes % 60);
     }
   }
+
+  void refreshReports() async {
+    reports = await fetchReports();
+    notifyListeners();
+  }
 }
 

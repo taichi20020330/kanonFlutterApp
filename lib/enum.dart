@@ -9,41 +9,38 @@ enum UserLabel {
   final String label;
 }
 
-
 List<String> simpleUserNameList = [
-  "吉田和徳",
-  "加藤恭子",
-  "尾池みどり",
-  "前田美紀子",
-  "河西富士子",
-  "松田薫",
-  "佐々木純子",
-  "樋口眞美",
-  "絹本啓子",
-  "檜山真悠子",
-  "檜山高寛",
-  "小川敦",
-  "松本誠也",
-  "井内和美",
-  "秋谷佳汰",
-  "戸松和也",
-  "佐野真由美",
-  "岡本陽斗",
-  "佐藤尚貴",
-  "里谷裕貴",
-  "高橋正子",
-  "真田珠青",
-  "石田和久",
-  "大下照美",
-  "大木幸子",
+  "佐藤 真美",
+  "鈴木 太郎",
+  "高橋 みさき",
+  "田中 健太",
+  "渡辺 美香",
+  "伊藤 貴子",
+  "山本 勇介",
+  "中村 さやか",
+  "小林 大輝",
+  "加藤 みゆき",
+  "山田 裕太",
+  "斎藤 千佳",
+  "木村 健司",
+  "井上 あやこ",
+  "山口 大樹",
+  "小川 まどか",
+  "加藤 聡太",
+  "鈴木 由美",
+  "高橋 明美",
+  "田村 啓介",
+  "中島 美咲",
+  "小野 誠",
+  "藤本 知子",
+  "菊地 貴之",
+  "川田 美希",
 ];
-
-
-
 
 enum TimeLabel {
   startTime,
-  endTime, selectTime,
+  endTime,
+  selectTime,
 }
 
 enum OpenFormPageMode {
@@ -56,10 +53,4 @@ enum TimeSelectButtonMode {
   endTimeMode,
 }
 
-
-enum PageType {
-  Report,
-  Calender,
-  Settings
-}
-
+enum PageType { Report, Calender, Settings }
