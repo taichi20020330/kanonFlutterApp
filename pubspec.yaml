@@ -50,7 +50,6 @@ dependencies:
   googleapis_auth: ^1.4.1
   firebase_core: ^2.24.2
   cloud_firestore: ^4.13.6
-=========
   http: ^1.1.0
   table_calendar: ^3.0.9
   freezed: ^2.4.6
