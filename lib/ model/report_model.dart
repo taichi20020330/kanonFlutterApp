@@ -6,25 +6,10 @@ import 'package:kanon_app/data/report.dart';
 class ReportModel extends ChangeNotifier {
   List<Report> reports = [];
 
-  Future<List<Report>> fetchReports() async {
-    final docs = await FirebaseFirestore.instance.collection('reports').get();
-    final reports = docs.docs.map((doc) {
-      Timestamp startTime = doc['startTime'];
-      Timestamp endTime = doc['endTime'];
-      Timestamp roundUpEndTime = doc['roundUpEndTime'];
-      Timestamp date = doc['date'];
-      return Report(
-          startTime: startTime.toDate(),
-          endTime: endTime.toDate(),
-          roundUpEndTime: roundUpEndTime.toDate(),
-          fee: doc['fee'],
-          user: doc['user'],
-          description: doc['description'],
-          date: date.toDate(),
-          id: doc.id);
-    }).toList();
-    this.reports = reports;
-    return reports;
+  Stream<QuerySnapshot> fetchReports() {
+    final Stream<QuerySnapshot> _reportsStream =
+        FirebaseFirestore.instance.collection('reports').snapshots();
+    return _reportsStream;
   }
 
   void addReport(DateTime date, DateTime startTime, DateTime endTime, int? fee,
@@ -69,8 +54,4 @@ class ReportModel extends ChangeNotifier {
     }
   }
 
-  void refreshReports() async {
-    reports = await fetchReports();
-    notifyListeners();
-  }
 }

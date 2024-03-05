@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:kanon_app/%20model/report_model.dart';
 import 'package:kanon_app/page/calender.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/page/form.dart';
@@ -11,25 +13,18 @@ import 'package:kanon_app/data/report.dart';
 
 
 
+
+final reportListProvider = ChangeNotifierProvider((ref) => ReportModel());
+
+
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
   
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final reports = ref.watch(reportListProvider).reports;
-
-    // List<Report> sortedReports = reports
-    //   ..sort((a, b) => a.date.compareTo(b.date));
-
-    // Map<String, List<Report>> groupedReports =
-    //     groupReportsByMonth(sortedReports);
-
-    // Future<List<Report>> _data = ref.watch(reportListProvider).fetchReports();
-
-    return FutureBuilder<List<Report>>(
-        future: ref.watch(reportListProvider).fetchReports(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: ref.watch(reportListProvider).fetchReports(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // データ取得中の表示など、ローディング表示を追加することができます
             return const CircularProgressIndicator(); // 例: ローディング中のインジケーター
@@ -37,42 +32,50 @@ class Home extends HookConsumerWidget {
             // エラーが発生した場合の表示
             return Text('Error: ${snapshot.error}');
           } else {
-            final reports = snapshot.data!;
+            if (snapshot.hasData) {
+              final reports = snapshot.data?.docs
+                      .map((doc) => Report(
+                          id: doc.id,
+                          startTime: doc['startTime'].toDate(),
+                          endTime: doc['endTime'].toDate(),
+                          roundUpEndTime: doc['roundUpEndTime'].toDate(),
+                          fee: doc['fee'],
+                          user: doc['user'],
+                          description: doc['description'],
+                          date: doc['date'].toDate()))
+                      .toList() ??
+                  [];
 
-            List<Report> sortedReports = reports
-              ..sort((Report a, Report b) => a.date.compareTo(b.date));
+              List<Report> sortedReports = reports
+                ..sort((Report a, Report b) => a.date.compareTo(b.date));
 
-            Map<String, List<Report>> groupedReports =
-                groupReportsByMonth(sortedReports);
+              Map<String, List<Report>> groupedReports =
+                  groupReportsByMonth(sortedReports);
 
-            return DefaultTabController(
-              length: groupedReports.keys.length,
-              child: Scaffold(
-                appBar: AppBar(
-                  title: const Text('かのん介護'),
-                  bottom: TabBar(
-                    isScrollable: true,
-                    tabs: groupedReports.keys
-                        .map((String month) => Tab(
-                              text: month,
-                            ))
-                        .toList(),
+              return DefaultTabController(
+                length: groupedReports.keys.length,
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: const Text('かのん介護'),
+                    bottom: TabBar(
+                      isScrollable: true,
+                      tabs: groupedReports.keys
+                          .map((String month) => Tab(
+                                text: month,
+                              ))
+                          .toList(),
+                    ),
                   ),
-                ),
-                body: TabBarView(
-                  children: groupedReports.entries.map((entry) {
-                    List<Report> sortedReports = entry.value.toList()
-                      ..sort((a, b) => a.date.compareTo(b.date));
-                    Duration totalWorkTime =
-                        calculateTotalWorkTime(sortedReports);
-                    double monthlySalary =
-                        calculateMonthlySalary(totalWorkTime);
+                  body: TabBarView(
+                    children: groupedReports.entries.map((entry) {
+                      List<Report> sortedReports = entry.value.toList()
+                        ..sort((a, b) => a.date.compareTo(b.date));
+                      Duration totalWorkTime =
+                          calculateTotalWorkTime(sortedReports);
+                      double monthlySalary =
+                          calculateMonthlySalary(totalWorkTime);
 
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        await ref.watch(reportListProvider).fetchReports();
-                      },
-                      child: ListView(
+                      return ListView(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 40),
                         children: [
@@ -89,18 +92,20 @@ class Home extends HookConsumerWidget {
                             ),
                           ],
                         ],
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: () =>
+                        openFormPage(context, OpenFormPageMode.add, null),
+                    tooltip: 'Increment',
+                    child: const Icon(Icons.add),
+                  ),
                 ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () =>
-                      openFormPage(context, OpenFormPageMode.add, null),
-                  tooltip: 'Increment',
-                  child: const Icon(Icons.add),
-                ),
-              ),
-            );
+              );
+            } else {
+              return const CircularProgressIndicator(); // 例: ローディング中のインジケーター
+            }
           }
         });
   }
