@@ -22,7 +22,7 @@ class BottomNavigationPage extends ConsumerWidget {
     switch(currentPage) {
       case PageType.Report:
         appBarTitle = "Report";
-        bodyWidget = ScheduleListPage();
+        bodyWidget = Home();
         break;
       case PageType.Calender:
         appBarTitle = "Calender";
@@ -32,6 +32,7 @@ class BottomNavigationPage extends ConsumerWidget {
         appBarTitle = "Settings";
         bodyWidget = Container();
         break;
+      
     }
 
     return Scaffold(

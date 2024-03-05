@@ -17,64 +17,92 @@ class Home extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reports = ref.watch(reportListProvider);
-    List<Report> sortedReports = reports.toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
-    Map<String, List<Report>> groupedReports = groupReportsByMonth(reports);
+    // final reports = ref.watch(reportListProvider).reports;
 
-    return DefaultTabController(
-      length: groupedReports.keys.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('かのん介護'),
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: groupedReports.keys
-                .map((String month) => Tab(
-                      text: month,
-                    ))
-                .toList(),
-          ),
-        ),
-        // body: ScheduleList(context, ref),
-        body: ReportList(context, sortedReports),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _openFormPage(context, OpenFormPageMode.add, null),
-          // onPressed: () => WorkList(),
-          child: const Icon(Icons.add),
-        ),
-        
-      ),
-    );
-  }
+    // List<Report> sortedReports = reports
+    //   ..sort((a, b) => a.date.compareTo(b.date));
 
-  ReportList(BuildContext context, List<Report> reports) {
-    Map<String, List<Report>> groupedReports = groupReportsByMonth(reports);
-    return TabBarView(
-      children: groupedReports.entries.map((entry) {
-        List<Report> sortedReports = entry.value.toList()
-          ..sort((a, b) => a.date.compareTo(b.date));
-        Duration totalWorkTime = calculateTotalWorkTime(sortedReports);
-        double monthlySalary = calculateMonthlySalary(totalWorkTime);
+    // Map<String, List<Report>> groupedReports =
+    //     groupReportsByMonth(sortedReports);
 
-        return ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          children: [
-            WorkTimeText(totalWorkTime),
-            SalaryText(monthlySalary),
-            for (var report in sortedReports) ...[
-              if (sortedReports.indexOf(report) > 0) const Divider(height: 0),
-              ProviderScope(
-                overrides: [
-                  _currentReport.overrideWithValue(report),
-                ],
-                child: const ReportItem(),
+    // Future<List<Report>> _data = ref.watch(reportListProvider).fetchReports();
+
+    return FutureBuilder<List<Report>>(
+        future: ref.watch(reportListProvider).fetchReports(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // データ取得中の表示など、ローディング表示を追加することができます
+            return const CircularProgressIndicator(); // 例: ローディング中のインジケーター
+          } else if (snapshot.hasError) {
+            // エラーが発生した場合の表示
+            return Text('Error: ${snapshot.error}');
+          } else {
+            final reports = snapshot.data!;
+
+            List<Report> sortedReports = reports
+              ..sort((Report a, Report b) => a.date.compareTo(b.date));
+
+            Map<String, List<Report>> groupedReports =
+                groupReportsByMonth(sortedReports);
+
+            return DefaultTabController(
+              length: groupedReports.keys.length,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: const Text('かのん介護'),
+                  bottom: TabBar(
+                    isScrollable: true,
+                    tabs: groupedReports.keys
+                        .map((String month) => Tab(
+                              text: month,
+                            ))
+                        .toList(),
+                  ),
+                ),
+                body: TabBarView(
+                  children: groupedReports.entries.map((entry) {
+                    List<Report> sortedReports = entry.value.toList()
+                      ..sort((a, b) => a.date.compareTo(b.date));
+                    Duration totalWorkTime =
+                        calculateTotalWorkTime(sortedReports);
+                    double monthlySalary =
+                        calculateMonthlySalary(totalWorkTime);
+
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await ref.watch(reportListProvider).fetchReports();
+                      },
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 40),
+                        children: [
+                          WorkTimeText(totalWorkTime),
+                          SalaryText(monthlySalary),
+                          for (var report in sortedReports) ...[
+                            if (sortedReports.indexOf(report) > 0)
+                              const Divider(height: 0),
+                            ProviderScope(
+                              overrides: [
+                                _currentReport.overrideWithValue(report),
+                              ],
+                              child: const ReportItem(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () =>
+                      openFormPage(context, OpenFormPageMode.add, null),
+                  tooltip: 'Increment',
+                  child: const Icon(Icons.add),
+                ),
               ),
-            ],
-          ],
-        );
-      }).toList(),
-    );
+            );
+          }
+        });
   }
 
   
@@ -171,7 +199,7 @@ class ReportItem extends HookConsumerWidget {
     }
   }
 
-  String formatTime(TimeOfDay time) {
+  String formatTime(DateTime time) {
     // intlパッケージを使用して24時間形式でフォーマット
     final formattedTime =
         DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
@@ -201,7 +229,7 @@ class CardMenuTrailing extends HookConsumerWidget {
       onSelected: (String value) {
         switch (value) {
           case 'edit':
-            _openFormPage(context, OpenFormPageMode.edit, report);
+            openFormPage(context, OpenFormPageMode.edit, report);
             break;
           case 'delete':
             ref.read(reportListProvider.notifier).removeReport(report);
@@ -212,7 +240,7 @@ class CardMenuTrailing extends HookConsumerWidget {
   }
 }
 
-_openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
+openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) => FormPage(

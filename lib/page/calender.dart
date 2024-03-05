@@ -11,6 +11,7 @@ import 'package:kanon_app/%20model/work_model.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/work.dart';
+import 'package:kanon_app/page/schedule_list_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../data/utils.dart';
@@ -30,7 +31,10 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
 
-    ref.read(worksProvider);
+    ref.read(workListProvider);
+    ref.listenManual(workListProvider, (previous, next) {
+      // TODO show a snackbar/dialog
+    });
   }
 
   @override
@@ -51,21 +55,10 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<Work>> works = ref.watch(worksProvider);
+    final AsyncValue<List<Work>> works = ref.watch(workListProvider);
 
     works.when(
       data: (worksList) {
-        // if (!listEquals(worksList, previousWorks)) {
-        //   for (var work in worksList) {
-        //     String title = '${convertUserIdToUserName(work.userId)} '
-        //         ' ${convertToTimeFormat(work.scheduledStartTime)}';
-        //     scheduleList.add({
-        //       'datetime': work.date,
-        //       'title': title,
-        //     });
-        //   }
-        // }
-        // previousWorks = worksList;
         for (var work in worksList) {
           final date = work.date;
           final id = work.id;

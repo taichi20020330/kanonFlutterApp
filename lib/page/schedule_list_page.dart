@@ -15,7 +15,7 @@ class ScheduleListPage extends HookConsumerWidget {
   }
 
   ScheduleList(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Work>> works = ref.watch(worksProvider);
+    final AsyncValue<List<Work>> works = ref.watch(workListProvider);
     return Center(
       child: works.when(
         data: (worksList) {
@@ -29,7 +29,7 @@ class ScheduleListPage extends HookConsumerWidget {
               final work = worksList[index];
               return ListTile(
                 title: Text(work.id),
-                subtitle: Text(work.date.toString()),
+                // subtitle: Text(work.date.toString()),
                 // 他のアクティビティプロパティにアクセスするには、ここに追加
               );
             },

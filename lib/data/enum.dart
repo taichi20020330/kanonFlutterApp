@@ -61,6 +61,6 @@ enum TimeSelectButtonMode {
 enum PageType {
   Report,
   Calender,
-  Settings
+  Settings,
 }
 

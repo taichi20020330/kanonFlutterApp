@@ -3,44 +3,56 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:kanon_app/data/work.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 part 'work_model.g.dart';
 
+
 class WorkModel extends Notifier<List<Work>> {
+
   @override
   List<Work> build() => [];
 }
 
 @riverpod
-Future<List<Work>> works(WorksRef ref) async {
-  // Using package:http, we fetch a random activity from the Bored API.
-  final response = await http.get(Uri.https('api.sssapi.app', 'un4YOrTFzJOmeag_VJlNs'));
-  // Using dart:convert, we then decode the JSON payload into a Map data structure.
-  List<dynamic> jsonList = jsonDecode(response.body);
-  List<Work> works = jsonList.map((json) {
-      // Use parseJapaneseDate to convert the date string to DateTime.
-      String parsedDate = parseJapaneseDate(json['date'] as String);
-      
-      // Create a Work object with the parsed DateTime.
-      return Work.fromJson({
-        ...json,
-        'date': parsedDate,
-      });
-    }).toList();
+Future<List<Work>> workList(WorkListRef ref) async {
+  // Firestoreからデータを取得
+  QuerySnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('work').get();
+
+  // データをWorkオブジェクトのリストに変換
+  List<Work> works = snapshot.docs.map((doc) {
+    Map<String, dynamic> data = doc.data();
+
+    DateTime date = (data['date'] as Timestamp).toDate();
+    int start = extractTimeFromTimestamp(data['scheduledStartTime'] as Timestamp);
+    int end = extractTimeFromTimestamp(data['scheduledEndTime'] as Timestamp);
+
+    // Create a Work object with the parsed DateTime.
+    return Work.fromJson({
+      'id': doc.id,
+      'date': date.toString(),
+      'scheduledStartTime': start,
+      'scheduledEndTime': end,
+      'userId': data['userId'],
+      'helperId': data['helperId'],
+    });
+  }).toList(); 
+
   return works;
 }
 
-String parseJapaneseDate(String dateString) {
-  List<String> parts = dateString.split('/');
-  if (parts.length == 3) {
-    int year = int.parse(parts[0]);
-    int month = int.parse(parts[1]);
-    int day = int.parse(parts[2]);
-    String date = DateTime(year, month, day).toString();
-    
-    return date;
-  } else {
-    throw FormatException("Invalid date format: $dateString");
-  }
+
+
+int extractTimeFromTimestamp(Timestamp timestamp) {
+  // Convert Timestamp to DateTime
+  DateTime dateTime = timestamp.toDate();
+
+  // Extract hours and minutes and convert to int
+  int time = dateTime.hour * 100 + dateTime.minute;
+
+  return time;
 }
+
 

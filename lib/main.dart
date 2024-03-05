@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:kanon_app/module/bottom_navigation.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/provider.dart';
@@ -9,12 +10,12 @@ import 'package:kanon_app/%20model/report_model.dart';
 // import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kanon_app/page/form.dart';
 import 'firebase_options.dart';
 
 
-final reportListProvider =
-    ChangeNotifierProvider((ref) => ReportModel());
-    final pageProvider = NotifierProvider<PageNotifier, PageType>(PageNotifier.new);
+final reportListProvider = ChangeNotifierProvider((ref) => ReportModel());
+final pageProvider = NotifierProvider<PageNotifier, PageType>(PageNotifier.new);
 
 
 
@@ -98,7 +99,7 @@ class ReportItem extends HookConsumerWidget {
     }
   }
 
-  String formatTime(TimeOfDay time) {
+  String formatTime(DateTime time) {
     // intlパッケージを使用して24時間形式でフォーマット
     final formattedTime = DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
     return formattedTime;
@@ -127,7 +128,7 @@ class CardMenuTrailing extends HookConsumerWidget {
       onSelected: (String value) {
         switch (value) {
           case 'edit':
-            _openFormPage(context, OpenFormPageMode.edit, report);
+            openFormPage(context, OpenFormPageMode.edit, report);
             break;
           case 'delete':
             ref.read(reportListProvider.notifier).removeReport(report);
@@ -136,6 +137,15 @@ class CardMenuTrailing extends HookConsumerWidget {
       },
     );
   }
+}
 
-  
+openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => FormPage(
+        mode: mode,
+        currentReport: report,
+      ),
+    ),
+  );
 }
