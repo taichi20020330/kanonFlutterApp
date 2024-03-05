@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:kanon_app/calender.dart';
-import 'package:kanon_app/enum.dart';
-import 'package:kanon_app/form.dart';
+import 'package:kanon_app/page/calender.dart';
+import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/page/form.dart';
 import 'package:kanon_app/main.dart';
-import 'package:kanon_app/provider.dart';
-import 'package:kanon_app/report.dart';
-import 'package:kanon_app/report_model.dart';
-import 'package:kanon_app/work.dart';
+import 'package:kanon_app/data/provider.dart';
+import 'package:kanon_app/main.dart';
+import 'package:kanon_app/data/report.dart';
 
 
-final reportListProvider =
-    // NotifierProvider<ReportModel, List<Report>>(ReportModel.new);
-    ChangeNotifierProvider((ref) => ReportModel());
 
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
+  
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -98,7 +95,7 @@ class Home extends HookConsumerWidget {
                 ),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () =>
-                      _openFormPage(context, OpenFormPageMode.add, null),
+                      openFormPage(context, OpenFormPageMode.add, null),
                   tooltip: 'Increment',
                   child: const Icon(Icons.add),
                 ),
@@ -107,6 +104,8 @@ class Home extends HookConsumerWidget {
           }
         });
   }
+
+  
 
   WorkTimeText(Duration totalWorkTime) {
     return Text(
@@ -176,7 +175,7 @@ class ReportItem extends HookConsumerWidget {
             selectUser(report.user),
           ),
           subtitle: Text(
-              '$formattedDate ${formatTime(TimeOfDay(hour: report.startTime.hour, minute: report.startTime.minute))} ~ ${formatTime(TimeOfDay(hour: report.endTime.hour, minute: report.endTime.minute))}'),
+              '$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
           trailing: const CardMenuTrailing(),
         ),
       ),
@@ -200,7 +199,7 @@ class ReportItem extends HookConsumerWidget {
     }
   }
 
-  String formatTime(TimeOfDay time) {
+  String formatTime(DateTime time) {
     // intlパッケージを使用して24時間形式でフォーマット
     final formattedTime =
         DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
@@ -230,7 +229,7 @@ class CardMenuTrailing extends HookConsumerWidget {
       onSelected: (String value) {
         switch (value) {
           case 'edit':
-            _openFormPage(context, OpenFormPageMode.edit, report);
+            openFormPage(context, OpenFormPageMode.edit, report);
             break;
           case 'delete':
             ref.read(reportListProvider.notifier).removeReport(report);
@@ -241,7 +240,7 @@ class CardMenuTrailing extends HookConsumerWidget {
   }
 }
 
-_openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
+openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) => FormPage(

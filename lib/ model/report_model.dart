@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'report.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kanon_app/data/report.dart';
 
 class ReportModel extends ChangeNotifier {
   List<Report> reports = [];
@@ -74,4 +74,3 @@ class ReportModel extends ChangeNotifier {
     notifyListeners();
   }
 }
-

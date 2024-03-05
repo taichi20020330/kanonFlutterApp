@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'provider.dart';
+part of 'work_model.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$worksHash() => r'b69299a94d654035f33ab7dc9a3db4144e271efb';
+String _$workListHash() => r'1f64dc9a685fa098b62eff6a029a3b8a71a9bd9a';
 
-/// See also [works].
-@ProviderFor(works)
-final worksProvider = AutoDisposeFutureProvider<List<Work>>.internal(
-  works,
-  name: r'worksProvider',
+/// See also [workList].
+@ProviderFor(workList)
+final workListProvider = AutoDisposeFutureProvider<List<Work>>.internal(
+  workList,
+  name: r'workListProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$worksHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$workListHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef WorksRef = AutoDisposeFutureProviderRef<List<Work>>;
+typedef WorkListRef = AutoDisposeFutureProviderRef<List<Work>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kanon_app/calender.dart';
-import 'package:kanon_app/enum.dart';
-import 'package:kanon_app/form.dart';
-import 'package:kanon_app/home.dart';
+import 'package:kanon_app/page/calender.dart';
+import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/page/form.dart';
+import 'package:kanon_app/page/home.dart';
 import 'package:kanon_app/main.dart';
-import 'package:kanon_app/schedule_list_page.dart';
+import 'package:kanon_app/page/schedule_list_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class BottomNavigationPage extends ConsumerWidget {
@@ -31,6 +31,7 @@ class BottomNavigationPage extends ConsumerWidget {
         appBarTitle = "Settings";
         bodyWidget = Container();
         break;
+      
     }
 
     return Scaffold(
