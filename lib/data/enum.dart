@@ -9,7 +9,6 @@ enum UserLabel {
   final String label;
 }
 
-
 List<String> simpleUserNameList = [
   "佐藤真美",
   "鈴木太郎",
@@ -38,13 +37,10 @@ List<String> simpleUserNameList = [
   "川田美希"
 ];
 
-
-
-
-
 enum TimeLabel {
   startTime,
-  endTime, selectTime,
+  endTime,
+  selectTime,
 }
 
 enum OpenFormPageMode {
@@ -57,10 +53,9 @@ enum TimeSelectButtonMode {
   endTimeMode,
 }
 
-
 enum PageType {
   Report,
-  Calender,
+  Calendar,
   Settings,
+  Logout,
 }
-

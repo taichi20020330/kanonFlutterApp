@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,7 +8,7 @@ import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/%20model/report_model.dart';
-// import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:kanon_app/page/login.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kanon_app/page/form.dart';
@@ -36,24 +37,60 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-       localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: [
-        Locale('ja'),
-      ],
-      locale: Locale('ja'),
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      home: BottomNavigationPage(),
+    // return const MaterialApp(
+    //   localizationsDelegates: [
+    //     GlobalMaterialLocalizations.delegate,
+    //     GlobalWidgetsLocalizations.delegate,
+    //     GlobalCupertinoLocalizations.delegate,
+    //   ],
+    //   supportedLocales: [
+    //     Locale('ja'),
+    //   ],
+    //   locale: Locale('ja'),
+    //   debugShowCheckedModeBanner: false,
+    //   title: 'Flutter Demo',
+    //   home: LoginPage(),
+    // );
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+        if (snapshot.hasData) {
+          // ログインしている場合の表示するウィジェット
+          return const MaterialApp(
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              Locale('ja'),
+            ],
+            locale: Locale('ja'),
+            debugShowCheckedModeBanner: false,
+            title: 'Flutter Demo',
+            home: BottomNavigationPage(),
+          );
+        } else {
+          // ログインしていない場合の表示するウィジェット
+          return const MaterialApp(
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              Locale('ja'),
+            ],
+            locale: Locale('ja'),
+            debugShowCheckedModeBanner: false,
+            title: 'Flutter Demo',
+            home: LoginPage(),
+          );
+        }
+      },
     );
   }
 }
-
-
 
 final _currentReport = Provider<Report>((ref) => throw UnimplementedError());
 
@@ -65,21 +102,21 @@ class ReportItem extends HookConsumerWidget {
     final report = ref.watch(_currentReport);
     String formattedDate = DateFormat('yyyy年MM月dd日').format(report.date);
 
-    return  Material(
+    return Material(
       child: Card(
         child: ListTile(
-        title: Text(
-          selectUser(report.user),
-        ),
-        subtitle: Text('$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
-        trailing: const CardMenuTrailing(),
+          title: Text(
+            selectUser(report.user),
           ),
-          
+          subtitle: Text(
+              '$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
+          trailing: const CardMenuTrailing(),
+        ),
       ),
     );
   }
 
-  String selectUser(int userNumber){
+  String selectUser(int userNumber) {
     switch (userNumber) {
       case 0:
         return '戸松さん';
@@ -98,7 +135,8 @@ class ReportItem extends HookConsumerWidget {
 
   String formatTime(DateTime time) {
     // intlパッケージを使用して24時間形式でフォーマット
-    final formattedTime = DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
+    final formattedTime =
+        DateFormat.Hm().format(DateTime(2023, 1, 1, time.hour, time.minute));
     return formattedTime;
   }
 }
