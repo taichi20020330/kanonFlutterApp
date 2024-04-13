@@ -17,8 +17,6 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../data/utils.dart';
 
-
-
 class TableEventsExample extends ConsumerStatefulWidget {
   const TableEventsExample({super.key});
 
@@ -41,20 +39,9 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   @override
   void initState() {
     super.initState();
-    // "ref" can be used in all life-cycles of a StatefulWidget.
     kEvents = ref.read(eventsNotifierProvider);
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-    AsyncValue<List<Work>> works = ref.read(workListNotifierProvider);
-    works.when(
-          data: (worksList) {
-            for (final work in worksList) {
-              addWorkEvents(work);
-            }
-          },
-          loading: () => const CircularProgressIndicator(),
-          error: (error, stackTrace) => Text('Error: $error'),
-        );    
   }
 
   @override
@@ -62,7 +49,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     _selectedEvents.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +60,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
         ),
         body: works.when(
           data: (worksList) {
-            for (final work in worksList) {
-              addWorkEvents(work);
-            }
+            for (final work in worksList) {}
             return Column(
               children: [
                 CalendarWidget(),
@@ -91,11 +75,14 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.refresh),
           onPressed: () {
-            // firebaseからデータを取得し、stateを更新
-            ref
-                .read(workListNotifierProvider.notifier)
-                .fetchWorkListfromFirestore();
-            
+            AsyncValue<List<Work>> works = ref.read(workListNotifierProvider);
+            works.when(
+              data: (worksList) {
+                ref.read(eventsNotifierProvider.notifier).addEvents(worksList);
+              },
+              loading: () => const CircularProgressIndicator(),
+              error: (error, stackTrace) => Text('Error: $error'),
+            );
           },
         ));
   }
@@ -205,20 +192,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       _selectedEvents.value = _getEventsForDay(start);
     } else if (end != null) {
       _selectedEvents.value = _getEventsForDay(end);
-    }
-  }
-
-  void addWorkEvents(Work work) {
-    final date = work.date;
-    final id = work.id;
-
-    // Check if the event with the same date and title already exists
-    final existingEvents = kEvents[date] ?? [];
-    final isDuplicate =
-        existingEvents.any((existingWork) => existingWork.id == id);
-
-    if (!isDuplicate) {
-      kEvents[date] = [...existingEvents, work];
     }
   }
 }

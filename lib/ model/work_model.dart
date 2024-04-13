@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:kanon_app/data/utils.dart';
 import 'package:kanon_app/data/work.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,10 +16,6 @@ class WorkListNotifier extends _$WorkListNotifier {
   @override
   Future<List<Work>> build() async {
     return fetchWorkListfromFirestore();
-  }
-
-  void updateWorkList(List<Work> works) async {
-    state = AsyncValue.data(works);
   }
 
   Future<List<Work>> fetchWorkListfromFirestore() async {
@@ -51,14 +48,5 @@ class WorkListNotifier extends _$WorkListNotifier {
 }
 
 
-int extractTimeFromTimestamp(Timestamp timestamp) {
-  // Convert Timestamp to DateTime
-  DateTime dateTime = timestamp.toDate();
-
-  // Extract hours and minutes and convert to int
-  int time = dateTime.hour * 100 + dateTime.minute;
-
-  return time;
-}
 
 

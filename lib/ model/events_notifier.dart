@@ -13,29 +13,59 @@ part 'events_notifier.g.dart';
 
 @riverpod
 class EventsNotifier extends _$EventsNotifier {
-  Map<DateTime, List<Work>> _kEventSource = {};
-
+  
   @override
-  LinkedHashMap<DateTime, List<Work>> build() {
+  Map<DateTime, List<Work>> build() {
+    final Map<DateTime, List<Work>> events = {};
+    List<Work> works = ref.read(workListNotifierProvider).value ?? [];
+
+    for (final work in works) {
+      final date = work.date;
+      final id = work.id;
+
+      // Check if the event with the same date and title already exists
+      final existingEvents = events[date] ?? [];
+      final isDuplicate =
+          existingEvents.any((existingWork) => existingWork.id == id);
+
+      if (!isDuplicate) {
+        events[date] = [...existingEvents, work];
+      }
+    }
+
     return LinkedHashMap<DateTime, List<Work>>(
       equals: isSameDay,
       hashCode: getHashCode,
-    )..addAll(_kEventSource);
+    )..addAll(events);
   }
 
-  void updateEvents() async {
-    // List<Work> works = ref.read(workListNotifierProvider.notifier).fetchWorkListfromFirestore().value;
+  void addEvents(List<Work> works) {
+    final events = state;
+    for (final work in works) {
+      final date = work.date;
+      final id = work.id;
 
-    // final old = AsyncValue.loading();
-    // const sec3 = Duration(seconds: 3);
-    // await Future.delayed(sec3);
+      // Check if the event with the same date and title already exists
+      final existingEvents = events[date] ?? [];
+      final isDuplicate =
+          existingEvents.any((existingWork) => existingWork.id == id);
 
-    
-
+      if (!isDuplicate) {
+        events[date] = [...existingEvents, work];
+      }
+    }
+    state = events;
   }
-  
 
+  void updateEvents(List<Work> works) async {
+    // // 今までのやつをを取得
 
+    // state = oldEvents;
+
+    // final newWorks = await ref.read(workListNotifierProvider.notifier).fetchWorkListfromFirestore();
+
+    // for (final work in newWorks) {
+    //   addWorkEvents(work);
+    // }
+  }
 }
-
-

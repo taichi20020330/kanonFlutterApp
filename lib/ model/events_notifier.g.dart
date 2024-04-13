@@ -6,12 +6,12 @@ part of 'events_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsNotifierHash() => r'3056c83baa40b813123551c741125dfb2510ae8f';
+String _$eventsNotifierHash() => r'f6cd05a50ba4cd43087e87bf7b7692a902f75275';
 
 /// See also [EventsNotifier].
 @ProviderFor(EventsNotifier)
 final eventsNotifierProvider = AutoDisposeNotifierProvider<EventsNotifier,
-    LinkedHashMap<DateTime, List<Work>>>.internal(
+    Map<DateTime, List<Work>>>.internal(
   EventsNotifier.new,
   name: r'eventsNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -21,7 +21,6 @@ final eventsNotifierProvider = AutoDisposeNotifierProvider<EventsNotifier,
   allTransitiveDependencies: null,
 );
 
-typedef _$EventsNotifier
-    = AutoDisposeNotifier<LinkedHashMap<DateTime, List<Work>>>;
+typedef _$EventsNotifier = AutoDisposeNotifier<Map<DateTime, List<Work>>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

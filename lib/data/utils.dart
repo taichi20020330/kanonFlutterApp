@@ -3,6 +3,7 @@
 
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/work.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -54,3 +55,13 @@ int getHashCode(DateTime key) {
   return key.day * 1000000 + key.month * 10000 + key.year;
 }
 
+
+int extractTimeFromTimestamp(Timestamp timestamp) {
+  // Convert Timestamp to DateTime
+  DateTime dateTime = timestamp.toDate();
+
+  // Extract hours and minutes and convert to int
+  int time = dateTime.hour * 100 + dateTime.minute;
+
+  return time;
+}

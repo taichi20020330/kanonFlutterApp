@@ -6,7 +6,7 @@ part of 'work_model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$workListNotifierHash() => r'e220844263acebebff42998f42a820f34b3b1ab4';
+String _$workListNotifierHash() => r'9221033ff6910893c6f6786b23b1e099a61c8526';
 
 /// See also [WorkListNotifier].
 @ProviderFor(WorkListNotifier)
