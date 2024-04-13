@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'work_model.dart';
+part of 'events_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$workListNotifierHash() => r'e220844263acebebff42998f42a820f34b3b1ab4';
+String _$eventsNotifierHash() => r'3056c83baa40b813123551c741125dfb2510ae8f';
 
-/// See also [WorkListNotifier].
-@ProviderFor(WorkListNotifier)
-final workListNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<WorkListNotifier, List<Work>>.internal(
-  WorkListNotifier.new,
-  name: r'workListNotifierProvider',
+/// See also [EventsNotifier].
+@ProviderFor(EventsNotifier)
+final eventsNotifierProvider = AutoDisposeNotifierProvider<EventsNotifier,
+    LinkedHashMap<DateTime, List<Work>>>.internal(
+  EventsNotifier.new,
+  name: r'eventsNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$workListNotifierHash,
+      : _$eventsNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$WorkListNotifier = AutoDisposeAsyncNotifier<List<Work>>;
+typedef _$EventsNotifier
+    = AutoDisposeNotifier<LinkedHashMap<DateTime, List<Work>>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

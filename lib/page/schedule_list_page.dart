@@ -15,7 +15,7 @@ class ScheduleListPage extends HookConsumerWidget {
   }
 
   ScheduleList(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Work>> works = ref.watch(workListProvider);
+    final AsyncValue<List<Work>> works = ref.watch(workListNotifierProvider);
     return Center(
       child: works.when(
         data: (worksList) {

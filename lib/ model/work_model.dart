@@ -1,22 +1,27 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:kanon_app/data/work.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 part 'work_model.g.dart';
 
-
-class WorkModel extends Notifier<List<Work>> {
-
-  @override
-  List<Work> build() => [];
-}
-
 @riverpod
-Future<List<Work>> workList(WorkListRef ref) async {
+class WorkListNotifier extends _$WorkListNotifier {
+  
+  @override
+  Future<List<Work>> build() async {
+    return fetchWorkListfromFirestore();
+  }
+
+  void updateWorkList(List<Work> works) async {
+    state = AsyncValue.data(works);
+  }
+
+  Future<List<Work>> fetchWorkListfromFirestore() async {
   // Firestoreからデータを取得
   QuerySnapshot<Map<String, dynamic>> snapshot =
       await FirebaseFirestore.instance.collection('work').get();
@@ -39,10 +44,11 @@ Future<List<Work>> workList(WorkListRef ref) async {
       'helperId': data['helperId'],
     });
   }).toList(); 
+  state = AsyncValue.data(works);
 
   return works;
 }
-
+}
 
 
 int extractTimeFromTimestamp(Timestamp timestamp) {
