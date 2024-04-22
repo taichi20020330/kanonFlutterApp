@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'work_model.dart';
+part of 'work_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator

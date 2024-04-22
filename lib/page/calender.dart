@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:kanon_app/%20model/events_notifier.dart';
-import 'package:kanon_app/%20model/work_model.dart';
+import 'package:kanon_app/%20model/work_notifier.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/work.dart';
@@ -16,6 +16,14 @@ import 'package:kanon_app/page/schedule_list_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../data/utils.dart';
+
+// Map<DateTime, List<Work>> kEvents = LinkedHashMap<DateTime, List<Work>>(
+//       equals: isSameDay,
+//       hashCode: getHashCode,
+//     )..addAll(_kEventSource);
+
+Map<DateTime, List<Work>> kEvents = {};
+Map<DateTime, List<Work>> _kEventSource = {};
 
 class TableEventsExample extends ConsumerStatefulWidget {
   const TableEventsExample({super.key});
@@ -34,14 +42,23 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
-  late final Map<DateTime, List<Work>> kEvents;
+  List<Work> currentWorkList = [];
 
   @override
   void initState() {
     super.initState();
-    kEvents = ref.read(eventsNotifierProvider);
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    currentWorkList =
+        await ref.read(workListNotifierProvider.notifier).updateWorkList();
+    for (final work in currentWorkList) {
+      _addWorkToEventSource(work);
+      _addEventSourceToCalendar();
+    }
   }
 
   @override
@@ -52,20 +69,19 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<List<Work>> works = ref.watch(workListNotifierProvider);
+    final works = ref.watch(workListNotifierProvider);
 
     return Scaffold(
         appBar: AppBar(
           title: const Text('勤務カレンダー'),
         ),
         body: works.when(
-          data: (worksList) {
-            for (final work in worksList) {}
+          data: (workList) {
             return Column(
               children: [
                 CalendarWidget(),
                 const SizedBox(height: 8.0),
-                EventListUnderCalendar(),
+                EventListUnderCalendar(workList),
               ],
             );
           },
@@ -74,27 +90,28 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.refresh),
-          onPressed: () {
-            AsyncValue<List<Work>> works = ref.read(workListNotifierProvider);
-            works.when(
-              data: (worksList) {
-                ref.read(eventsNotifierProvider.notifier).addEvents(worksList);
-              },
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stackTrace) => Text('Error: $error'),
-            );
+          onPressed: () async {
+            kEvents.clear();
+            _kEventSource.clear();
+            final notifier = ref.read(workListNotifierProvider.notifier);
+            currentWorkList = await notifier.updateWorkList();
+            _refreshEventList(currentWorkList);
           },
         ));
   }
 
-  Widget EventListUnderCalendar() {
+  Widget EventListUnderCalendar(List<Work> workList) {
     return Expanded(
+      // return (_isloading)
+      //     ? const CircularProgressIndicator()
+      //     : Expanded(
       child: ValueListenableBuilder<List<Work>>(
         valueListenable: _selectedEvents,
         builder: (context, value, _) {
           return ListView.builder(
             itemCount: value.length,
             itemBuilder: (context, index) {
+              final work = value[index];
               return Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: 12.0,
@@ -105,8 +122,14 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: ListTile(
-                  onTap: () => print('${value[index]}'),
-                  title: Text('${value[index]}'),
+                  // userIdからuserNameに変換
+                  title: Text(
+                    convertUserIdToUserName(work.userId),
+                  ),
+                  // startTimeとendTimeを時刻表示に変換
+                  subtitle: Text(
+                    '${convertToTimeFormat(work.scheduledStartTime)} - ${convertToTimeFormat(work.scheduledEndTime)}',
+                  ),
                 ),
               );
             },
@@ -193,5 +216,34 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     } else if (end != null) {
       _selectedEvents.value = _getEventsForDay(end);
     }
+  }
+
+  void _addWorkToEventSource(Work work) {
+    final id = work.id;
+    final date = work.date;
+    final existingEvents = _kEventSource[date] ?? [];
+
+    final isDuplicate =
+        existingEvents.any((existingWork) => existingWork.id == id);
+    if (!isDuplicate) {
+      _kEventSource[date] = [...existingEvents, work];
+    }
+  }
+
+  void _addEventSourceToCalendar() {
+    kEvents = LinkedHashMap<DateTime, List<Work>>(
+      equals: isSameDay,
+      hashCode: getHashCode,
+    )..addAll(_kEventSource);
+  }
+
+  void _refreshEventList(List<Work> works) async {
+    for (final work in works) {
+      _addWorkToEventSource(work);
+    }
+    _addEventSourceToCalendar();
+    setState(() {
+      _selectedEvents.value = _getEventsForDay(_selectedDay!);
+    });
   }
 }

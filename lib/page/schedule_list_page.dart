@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kanon_app/%20model/work_model.dart';
+import 'package:kanon_app/%20model/work_notifier.dart';
 import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/work.dart';
 
