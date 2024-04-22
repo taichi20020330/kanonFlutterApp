@@ -1,6 +1,7 @@
 
 import 'dart:convert';
-import 'package:kanon_app/%20model/work_model.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:kanon_app/%20model/work_notifier.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/work.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,3 +20,4 @@ class PageNotifier extends Notifier<PageType> {
     state = pageType;
   }
 }
+
