@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:kanon_app/%20model/report_model.dart';
-import 'package:kanon_app/page/calender.dart';
+import 'package:kanon_app/page/calendar.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/page/form.dart';
 import 'package:kanon_app/main.dart';
@@ -11,15 +11,11 @@ import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
 
-
-
-
 final reportListProvider = ChangeNotifierProvider((ref) => ReportModel());
-
 
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return StreamBuilder<QuerySnapshot>(
@@ -109,8 +105,6 @@ class Home extends HookConsumerWidget {
           }
         });
   }
-
-  
 
   WorkTimeText(Duration totalWorkTime) {
     return Text(

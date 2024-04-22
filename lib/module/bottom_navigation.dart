@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kanon_app/page/calender.dart';
+import 'package:kanon_app/page/calendar.dart';
 import 'package:kanon_app/data/enum.dart';
-import 'package:kanon_app/page/form.dart';
 import 'package:kanon_app/page/home.dart';
 import 'package:kanon_app/main.dart';
-import 'package:kanon_app/page/new_calendar.dart';
-import 'package:kanon_app/page/schedule_list_page.dart';
-import 'package:kanon_app/page/testpage.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:kanon_app/page/logout.dart';
 
 class BottomNavigationPage extends ConsumerWidget {
   const BottomNavigationPage({super.key});
@@ -20,20 +16,23 @@ class BottomNavigationPage extends ConsumerWidget {
 
     String appBarTitle;
     Widget bodyWidget;
-    switch(currentPage) {
+    switch (currentPage) {
       case PageType.Report:
         appBarTitle = "Report";
         bodyWidget = Home();
         break;
-      case PageType.Calender:
-        appBarTitle = "Calender";
+      case PageType.Calendar:
+        appBarTitle = "Calendar";
         bodyWidget = TableEventsExample();
         break;
       case PageType.Settings:
         appBarTitle = "Settings";
         bodyWidget = Container();
         break;
-      
+      case PageType.Logout:
+        appBarTitle = "Logout";
+        bodyWidget = LogoutPage();
+        break;
     }
 
     return Scaffold(
@@ -47,11 +46,15 @@ class BottomNavigationPage extends ConsumerWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),
-            label: 'Calender',
+            label: 'Calendar',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.logout),
+            label: 'Logout',
           ),
         ],
         onTap: (index) {
