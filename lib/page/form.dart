@@ -27,6 +27,7 @@ class FormPageState extends ConsumerState<FormPage> {
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
+  String? id;
   int fee = 0;
   DateTime date = DateTime.now();
   double maxValue = 0;
@@ -43,6 +44,7 @@ class FormPageState extends ConsumerState<FormPage> {
 
     if (mode == OpenFormPageMode.edit) {
       currentReport = widget.currentReport;
+      id = currentReport?.id;
       date = currentReport!.date;
       startTime = currentReport!.startTime;
       endTime = currentReport!.endTime;
@@ -88,7 +90,7 @@ class FormPageState extends ConsumerState<FormPage> {
                             context, TimeSelectButtonMode.startTimeMode),
                         TimeSelectButton(
                             context, TimeSelectButtonMode.endTimeMode),
-                        UserLabelButton(),
+                        UserLabelButton(selectedUser),
                         FeeTextField(),
                         DescriptionTextField(),
                         RegisterButton(),
@@ -136,9 +138,9 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  UserLabelButton() {
+  UserLabelButton(UserLabel label) {
     return DropdownMenu<UserLabel>(
-      initialSelection: UserLabel.user0,
+      initialSelection: label,
       controller: userController,
       // requestFocusOnTap is enabled/disabled by platforms when it is null.
       // On mobile platforms, this is false by default. Setting this to true will
@@ -172,7 +174,12 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   FeeTextField() {
+    final TextEditingController controller = TextEditingController(
+      text: fee.toString(),
+    );
+
     return TextField(
+      controller: controller,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
       decoration: const InputDecoration(
@@ -189,6 +196,7 @@ class FormPageState extends ConsumerState<FormPage> {
 
   DescriptionTextField() {
     return TextFormField(
+      initialValue: description,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         filled: true,
@@ -203,8 +211,15 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   _comfirmForm(BuildContext context) async {
-    ref.read(reportListProvider.notifier).addReport(
-        date, startTime!, endTime!, fee, description, selectedUser!.index);
+    //idが存在する場合は編集
+
+    if (currentReport != null) {
+      ref.read(reportListProvider.notifier).updateReport(currentReport!.id,
+          date, startTime!, endTime!, fee, description, selectedUser!.index);
+    } else {
+      ref.read(reportListProvider.notifier).addReport(
+          date, startTime!, endTime!, fee, description, selectedUser!.index);
+    }
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),

@@ -32,11 +32,17 @@ class ReportModel extends ChangeNotifier {
     FirebaseFirestore.instance.collection('reports').doc(report.id).delete();
   }
 
-  void updateReport(Report report) {
-    // state = [
-    //   for (final r in state)
-    //     if (r.id == report.id) report else r
-    // ];
+  void updateReport(String id, DateTime date, DateTime startTime,
+      DateTime endTime, int? fee, String? description, int user) async {
+    await FirebaseFirestore.instance.collection('reports').doc(id).update({
+      'startTime': startTime,
+      'endTime': endTime,
+      'roundUpEndTime': roundTimeToNearest15Minutes(endTime),
+      'fee': fee,
+      'user': user,
+      'description': description,
+      'date': date,
+    });
   }
 
   DateTime roundTimeToNearest15Minutes(DateTime time) {
@@ -53,5 +59,4 @@ class ReportModel extends ChangeNotifier {
           roundedMinutes % 60);
     }
   }
-
 }
