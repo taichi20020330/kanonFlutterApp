@@ -34,7 +34,6 @@ class FormPageState extends ConsumerState<FormPage> {
   bool enableFeature = false;
   DateTime? startTime = DateTime.now();
   DateTime? endTime = DateTime.now();
-  ReportModel reportModel = ReportModel();
   Report? currentReport;
   late OpenFormPageMode mode;
 

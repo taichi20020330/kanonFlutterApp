@@ -22,7 +22,6 @@ class _LogoutPageState extends ConsumerState<LogoutPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('ログアウト'),
-        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Container(

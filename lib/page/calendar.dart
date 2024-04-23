@@ -6,21 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:kanon_app/%20model/events_notifier.dart';
 import 'package:kanon_app/%20model/work_notifier.dart';
-import 'package:kanon_app/data/enum.dart';
-import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/data/work.dart';
-import 'package:kanon_app/page/schedule_list_page.dart';
 import 'package:table_calendar/table_calendar.dart';
-
 import '../data/utils.dart';
 
-// Map<DateTime, List<Work>> kEvents = LinkedHashMap<DateTime, List<Work>>(
-//       equals: isSameDay,
-//       hashCode: getHashCode,
-//     )..addAll(_kEventSource);
 
 Map<DateTime, List<Work>> kEvents = {};
 Map<DateTime, List<Work>> _kEventSource = {};
@@ -48,8 +38,8 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
     _initializeData();
+    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
   Future<void> _initializeData() async {
@@ -102,12 +92,11 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
   Widget EventListUnderCalendar(List<Work> workList) {
     return Expanded(
-      // return (_isloading)
-      //     ? const CircularProgressIndicator()
-      //     : Expanded(
       child: ValueListenableBuilder<List<Work>>(
         valueListenable: _selectedEvents,
         builder: (context, value, _) {
+          // _selectedEventsをscheduleStartTimeでソート
+          value.sort((a, b) => a.scheduledStartTime.compareTo(b.scheduledStartTime));
           return ListView.builder(
             itemCount: value.length,
             itemBuilder: (context, index) {
@@ -152,8 +141,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       rangeSelectionMode: _rangeSelectionMode,
       eventLoader: _getEventsForDay,
       startingDayOfWeek: StartingDayOfWeek.monday,
-      calendarStyle: CalendarStyle(
-        // Use `CalendarStyle` to customize the UI
+      calendarStyle: const CalendarStyle(
         outsideDaysVisible: false,
       ),
       onDaySelected: _onDaySelected,
@@ -172,12 +160,12 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   List<Work> _getEventsForDay(DateTime day) {
-    // Implementation example
+    if(kEvents[day] != null) {
+    }
     return kEvents[day] ?? [];
   }
 
   List<Work> _getEventsForRange(DateTime start, DateTime end) {
-    // Implementation example
     final days = daysInRange(start, end);
 
     return [
@@ -221,12 +209,13 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   void _addWorkToEventSource(Work work) {
     final id = work.id;
     final date = work.date;
-    final existingEvents = _kEventSource[date] ?? [];
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    final existingEvents = _kEventSource[dateOnly] ?? [];
 
     final isDuplicate =
         existingEvents.any((existingWork) => existingWork.id == id);
     if (!isDuplicate) {
-      _kEventSource[date] = [...existingEvents, work];
+      _kEventSource[dateOnly] = [...existingEvents, work];
     }
   }
 

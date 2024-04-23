@@ -11,7 +11,6 @@ import 'package:kanon_app/data/provider.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
 
-final reportListProvider = ChangeNotifierProvider((ref) => ReportModel());
 
 class Home extends HookConsumerWidget {
   const Home({Key? key}) : super(key: key);
@@ -52,7 +51,7 @@ class Home extends HookConsumerWidget {
                 length: groupedReports.keys.length,
                 child: Scaffold(
                   appBar: AppBar(
-                    title: const Text('かのん介護'),
+                    title: const Text('出勤簿リスト'),
                     bottom: TabBar(
                       isScrollable: true,
                       tabs: groupedReports.keys
