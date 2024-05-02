@@ -3,6 +3,7 @@
 
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,6 +16,7 @@ import '../data/utils.dart';
 Map<DateTime, List<Work>> kEvents = {};
 Map<DateTime, List<Work>> _kEventSource = {};
 
+
 class TableEventsExample extends ConsumerStatefulWidget {
   const TableEventsExample({super.key});
 
@@ -24,6 +26,7 @@ class TableEventsExample extends ConsumerStatefulWidget {
 
 class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   final db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   late final ValueNotifier<List<Work>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
@@ -33,6 +36,8 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
   List<Work> currentWorkList = [];
+  int helperId = 0;
+
 
   @override
   void initState() {
@@ -40,6 +45,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     _selectedDay = _focusedDay;
     _initializeData();
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    helperId = getHelperId();
   }
 
   Future<void> _initializeData() async {
@@ -60,6 +66,16 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   @override
   Widget build(BuildContext context) {
     final works = ref.watch(workListNotifierProvider);
+    
+      FirebaseAuth.instance
+  .authStateChanges()
+  .listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+    } else {
+      print('User is signed in!');
+    }
+  });
 
     return Scaffold(
         appBar: AppBar(
@@ -211,12 +227,16 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     final date = work.date;
     final dateOnly = DateTime(date.year, date.month, date.day);
     final existingEvents = _kEventSource[dateOnly] ?? [];
+    final helperId = work.helperId;
 
     final isDuplicate =
         existingEvents.any((existingWork) => existingWork.id == id);
-    if (!isDuplicate) {
+    final isSameUser = helperId == this.helperId;
+    if (!isDuplicate && isSameUser) {
       _kEventSource[dateOnly] = [...existingEvents, work];
     }
+
+    
   }
 
   void _addEventSourceToCalendar() {
@@ -235,4 +255,29 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       _selectedEvents.value = _getEventsForDay(_selectedDay!);
     });
   }
+
+  // ユーザー情報を取得する関数
+int getHelperId()  {
+  int heplerId;
+  try {
+    // 現在のユーザーを取得
+    User? user = _auth.currentUser;
+
+    // ユーザー情報が存在するか確認
+    if (user != null) {
+      String uid = user!.uid;
+
+      // uidを元に、userIdMappingListからuserNumberを取得
+      heplerId = helperIdMappingList[uid] ?? 0;
+
+    } else {
+      print('User is not signed in.');
+      heplerId = 0;
+    }
+  } catch (e) {
+    print('Failed to get user info: $e');
+    heplerId = 0;
+  }
+  return heplerId;
+}
 }

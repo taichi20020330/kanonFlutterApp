@@ -13,6 +13,12 @@ final kToday = DateTime.now();
 final kFirstDay = DateTime(kToday.year, kToday.month - 1, kToday.day);
 final kLastDay = DateTime(kToday.year, kToday.month + 1, kToday.day);
 
+final Map<String, int> helperIdMappingList = {
+  'nnnnnnnnnnnnnnnnnnnnnnnnnnnn': 0,
+  'tic57NzS85ROCWbJ5PXk8v3MSYI3': 1,
+  '3iMEqgbH3YM9lbNVBY83CbAXMxS2': 2,
+  'NyGgvA2FJ1VLcphr4jTchY9lAOw1': 3,
+};
 
 /// Example events.
 ///
