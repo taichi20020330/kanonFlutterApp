@@ -72,6 +72,7 @@ enum TimeLabel {
 enum OpenFormPageMode {
   add,
   edit,
+  workTap
 }
 
 enum TimeSelectButtonMode {

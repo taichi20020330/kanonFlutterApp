@@ -51,7 +51,17 @@ class FormPageState extends ConsumerState<FormPage> {
       fee = currentReport!.fee!;
       description = currentReport!.description!;
       selectedUser = UserLabel.values[currentReport!.user];
+    } else if(mode == OpenFormPageMode.workTap) {
+      currentReport = widget.currentReport;
+      id = currentReport?.id;
+      date = currentReport!.date;
+      startTime = currentReport!.startTime;
+      endTime = currentReport!.endTime;
+      fee = currentReport!.fee!;
+      description = currentReport!.description!;
+      selectedUser = UserLabel.values[currentReport!.user];
     }
+
 
     // "ref" can be used in all life-cycles of a StatefulWidget.
     ref.read(reportListProvider);

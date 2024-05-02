@@ -297,7 +297,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       user: work.userId,
     );
 
-    openFormPage(context, OpenFormPageMode.add, report);
+    openFormPage(context, OpenFormPageMode.workTap, report);
 
   }
 
