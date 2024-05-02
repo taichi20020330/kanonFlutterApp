@@ -8,14 +8,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kanon_app/%20model/work_notifier.dart';
+import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/data/work.dart';
+import 'package:kanon_app/page/home.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../data/utils.dart';
 
-
 Map<DateTime, List<Work>> kEvents = {};
 Map<DateTime, List<Work>> _kEventSource = {};
-
 
 class TableEventsExample extends ConsumerStatefulWidget {
   const TableEventsExample({super.key});
@@ -37,7 +38,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   DateTime? _rangeEnd;
   List<Work> currentWorkList = [];
   int helperId = 0;
-
 
   @override
   void initState() {
@@ -66,16 +66,14 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   @override
   Widget build(BuildContext context) {
     final works = ref.watch(workListNotifierProvider);
-    
-      FirebaseAuth.instance
-  .authStateChanges()
-  .listen((User? user) {
-    if (user == null) {
-      print('User is currently signed out!');
-    } else {
-      print('User is signed in!');
-    }
-  });
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+      }
+    });
 
     return Scaffold(
         appBar: AppBar(
@@ -112,7 +110,8 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
         valueListenable: _selectedEvents,
         builder: (context, value, _) {
           // _selectedEventsをscheduleStartTimeでソート
-          value.sort((a, b) => a.scheduledStartTime.compareTo(b.scheduledStartTime));
+          value.sort(
+              (a, b) => a.scheduledStartTime.compareTo(b.scheduledStartTime));
           return ListView.builder(
             itemCount: value.length,
             itemBuilder: (context, index) {
@@ -135,6 +134,10 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
                   subtitle: Text(
                     '${convertToTimeFormat(work.scheduledStartTime)} - ${convertToTimeFormat(work.scheduledEndTime)}',
                   ),
+                  onTap: () {
+                    // タップした時の処理
+                    submitReportsFromCalendar(context, work);
+                  },
                 ),
               );
             },
@@ -176,8 +179,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   List<Work> _getEventsForDay(DateTime day) {
-    if(kEvents[day] != null) {
-    }
+    if (kEvents[day] != null) {}
     return kEvents[day] ?? [];
   }
 
@@ -235,8 +237,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     if (!isDuplicate && isSameUser) {
       _kEventSource[dateOnly] = [...existingEvents, work];
     }
-
-    
   }
 
   void _addEventSourceToCalendar() {
@@ -257,27 +257,55 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   // ユーザー情報を取得する関数
-int getHelperId()  {
-  int heplerId;
-  try {
-    // 現在のユーザーを取得
-    User? user = _auth.currentUser;
+  int getHelperId() {
+    int heplerId;
+    try {
+      // 現在のユーザーを取得
+      User? user = _auth.currentUser;
 
-    // ユーザー情報が存在するか確認
-    if (user != null) {
-      String uid = user!.uid;
+      // ユーザー情報が存在するか確認
+      if (user != null) {
+        String uid = user!.uid;
 
-      // uidを元に、userIdMappingListからuserNumberを取得
-      heplerId = helperIdMappingList[uid] ?? 0;
-
-    } else {
-      print('User is not signed in.');
+        // uidを元に、userIdMappingListからuserNumberを取得
+        heplerId = helperIdMappingList[uid] ?? 0;
+      } else {
+        print('User is not signed in.');
+        heplerId = 0;
+      }
+    } catch (e) {
+      print('Failed to get user info: $e');
       heplerId = 0;
     }
-  } catch (e) {
-    print('Failed to get user info: $e');
-    heplerId = 0;
+    return heplerId;
   }
-  return heplerId;
-}
+
+  void submitReportsFromCalendar(BuildContext context, Work work) {
+    // workを元に、Reportを作成
+    final startTime =
+        getDateTimeFromIntTime(work.date, work.scheduledStartTime);
+    final endTime = getDateTimeFromIntTime(work.date, work.scheduledEndTime);
+
+    final report = Report(
+      id: work.id,
+      date: work.date,
+      startTime: startTime,
+      endTime: endTime,
+      roundUpEndTime: endTime,
+      fee: 0,
+      description: "",
+      user: work.userId,
+    );
+
+    openFormPage(context, OpenFormPageMode.add, report);
+
+  }
+
+  DateTime getDateTimeFromIntTime(DateTime date, int time) {
+    int hours = time ~/ 100; // 時間を取得
+    int minutes = time % 100; // 分を取得
+
+    return DateTime(date.year, date.month, date.day, hours, minutes);
+
+  }
 }
