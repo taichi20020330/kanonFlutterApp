@@ -12,8 +12,9 @@ import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/%20model/report_model.dart';
 
 class FormPage extends ConsumerStatefulWidget {
-  FormPage({required this.mode, this.currentReport, super.key});
+  FormPage({required this.mode, this.currentReport, this.workId, super.key});
   Report? currentReport;
+  String? workId;
   final OpenFormPageMode mode;
 
   @override
@@ -36,6 +37,7 @@ class FormPageState extends ConsumerState<FormPage> {
   DateTime? startTime = DateTime.now();
   DateTime? endTime = DateTime.now();
   Report? currentReport;
+  String? workId;
   late OpenFormPageMode mode;
 
   void initState() {
@@ -60,6 +62,7 @@ class FormPageState extends ConsumerState<FormPage> {
       fee = currentReport!.fee!;
       description = currentReport!.description!;
       selectedUser = UserLabel.values[currentReport!.user];
+      workId = widget.workId;
     }
 
 
@@ -223,12 +226,17 @@ class FormPageState extends ConsumerState<FormPage> {
   _comfirmForm(BuildContext context) async {
     //idが存在する場合は編集
 
-    if (currentReport != null) {
+    if (mode == OpenFormPageMode.edit) {
       ref.read(reportListProvider.notifier).updateReport(currentReport!.id,
           date, startTime!, endTime!, fee, description, selectedUser!.index);
-    } else {
+    } else if (mode == OpenFormPageMode.add ) {
       ref.read(reportListProvider.notifier).addReport(
           date, startTime!, endTime!, fee, description, selectedUser!.index);
+    } else if(mode == OpenFormPageMode.workTap && workId != null) {
+      print("addRelatedReport");
+      ref.read(reportListProvider.notifier).addRelatedReport(
+          date, startTime!, endTime!, fee, description, selectedUser!.index, workId!);
+
     }
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(

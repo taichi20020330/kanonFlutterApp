@@ -15,6 +15,7 @@ class Work with _$Work {
   required int scheduledEndTime,
   required int userId,
   required int helperId,
+  @Default("") String reportId
   }) = _Work;
 
   /// Convert a JSON object into an [Activity] instance.

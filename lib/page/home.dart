@@ -92,7 +92,7 @@ class Home extends HookConsumerWidget {
                   ),
                   floatingActionButton: FloatingActionButton(
                     onPressed: () =>
-                        openFormPage(context, OpenFormPageMode.add, null),
+                        openFormPage(context, OpenFormPageMode.add, null, null),
                     tooltip: 'Increment',
                     child: const Icon(Icons.add),
                   ),
@@ -227,7 +227,7 @@ class CardMenuTrailing extends HookConsumerWidget {
       onSelected: (String value) {
         switch (value) {
           case 'edit':
-            openFormPage(context, OpenFormPageMode.edit, report);
+            openFormPage(context, OpenFormPageMode.edit, report, null);
             break;
           case 'delete':
             ref.read(reportListProvider.notifier).removeReport(report);
@@ -238,12 +238,13 @@ class CardMenuTrailing extends HookConsumerWidget {
   }
 }
 
-openFormPage(BuildContext context, OpenFormPageMode mode, Report? report) {
+openFormPage(BuildContext context, OpenFormPageMode mode, Report? report, String? workId) {
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) => FormPage(
         mode: mode,
         currentReport: report,
+        workId: workId,
       ),
     ),
   );

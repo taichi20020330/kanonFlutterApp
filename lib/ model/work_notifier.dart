@@ -12,6 +12,9 @@ part 'work_notifier.g.dart';
 
 @riverpod
 class WorkListNotifier extends _$WorkListNotifier {
+  List<Work> works = [];
+
+
   @override
   Future<List<Work>> build() async {
     return fetchWorkListfromFirestore();
@@ -23,7 +26,7 @@ class WorkListNotifier extends _$WorkListNotifier {
         await FirebaseFirestore.instance.collection('work').get();
 
     // データをWorkオブジェクトのリストに変換
-    List<Work> works = snapshot.docs.map((doc) {
+    works = snapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data();
 
       DateTime date = (data['date'] as Timestamp).toDate();
@@ -47,9 +50,18 @@ class WorkListNotifier extends _$WorkListNotifier {
   }
 
   Future<List<Work>> updateWorkList() async {
-    final works = await fetchWorkListfromFirestore();
+    works = await fetchWorkListfromFirestore();
     state = AsyncValue.data(works);
     return works;
 
   }
+
+
+  void linkReportidWithWork(String reportId, String workId) async {
+    await FirebaseFirestore.instance.collection('work').doc(workId).update({
+      'reportId':  reportId
+    });
+  }
+
+
 }

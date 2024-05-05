@@ -134,6 +134,16 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
                   subtitle: Text(
                     '${convertToTimeFormat(work.scheduledStartTime)} - ${convertToTimeFormat(work.scheduledEndTime)}',
                   ),
+                  trailing: (work.reportId == "")
+                      ? const Icon(
+                          Icons.error,
+                          // 薄い赤色
+                          color: Colors.redAccent,
+                        )
+                      : const Icon(
+                          Icons.content_copy,
+                          // 薄い赤色
+                        ),
                   onTap: () {
                     // タップした時の処理
                     submitReportsFromCalendar(context, work);
@@ -281,12 +291,16 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   void submitReportsFromCalendar(BuildContext context, Work work) {
-    // workを元に、Reportを作成
+    final report = convertReportFromWork(work);
+    openFormPage(context, OpenFormPageMode.workTap, report, work.id);
+  }
+
+  Report convertReportFromWork(Work work) {
     final startTime =
         getDateTimeFromIntTime(work.date, work.scheduledStartTime);
     final endTime = getDateTimeFromIntTime(work.date, work.scheduledEndTime);
 
-    final report = Report(
+    return Report(
       id: work.id,
       date: work.date,
       startTime: startTime,
@@ -296,9 +310,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       description: "",
       user: work.userId,
     );
-
-    openFormPage(context, OpenFormPageMode.workTap, report);
-
   }
 
   DateTime getDateTimeFromIntTime(DateTime date, int time) {
@@ -306,6 +317,5 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     int minutes = time % 100; // 分を取得
 
     return DateTime(date.year, date.month, date.day, hours, minutes);
-
   }
 }
