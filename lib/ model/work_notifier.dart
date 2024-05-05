@@ -42,6 +42,7 @@ class WorkListNotifier extends _$WorkListNotifier {
         'scheduledEndTime': end,
         'userId': data['userId'],
         'helperId': data['helperId'],
+        'reportId': data['reportId']
       });
     }).toList();
     state = AsyncValue.data(works);

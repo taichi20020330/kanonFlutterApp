@@ -93,7 +93,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
           error: (error, stackTrace) => Text('Error: $error'),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.refresh),
+          child: const Icon(Icons.refresh),
           onPressed: () async {
             kEvents.clear();
             _kEventSource.clear();
@@ -116,6 +116,8 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
             itemCount: value.length,
             itemBuilder: (context, index) {
               final work = value[index];
+              bool isAttached = work.reportId != "";
+              print(work.id);
               return Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: 12.0,
@@ -134,15 +136,15 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
                   subtitle: Text(
                     '${convertToTimeFormat(work.scheduledStartTime)} - ${convertToTimeFormat(work.scheduledEndTime)}',
                   ),
-                  trailing: (work.reportId == "")
+                  trailing: (isAttached)
                       ? const Icon(
+                          Icons.content_copy,
+                          // 薄い赤色
+                        )
+                      : const Icon(
                           Icons.error,
                           // 薄い赤色
                           color: Colors.redAccent,
-                        )
-                      : const Icon(
-                          Icons.content_copy,
-                          // 薄い赤色
                         ),
                   onTap: () {
                     // タップした時の処理
@@ -268,24 +270,16 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
   // ユーザー情報を取得する関数
   int getHelperId() {
-    int heplerId;
+    int heplerId = 0;
     try {
-      // 現在のユーザーを取得
       User? user = _auth.currentUser;
-
-      // ユーザー情報が存在するか確認
       if (user != null) {
         String uid = user!.uid;
 
-        // uidを元に、userIdMappingListからuserNumberを取得
         heplerId = helperIdMappingList[uid] ?? 0;
-      } else {
-        print('User is not signed in.');
-        heplerId = 0;
       }
     } catch (e) {
-      print('Failed to get user info: $e');
-      heplerId = 0;
+      print(e);
     }
     return heplerId;
   }
