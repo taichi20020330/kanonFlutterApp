@@ -386,10 +386,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_localization
-      sha256: a65ae241b865f2780f2ef624a4cdd019ca894d0b7df0a0b77190746ef0b9c8fa
+      sha256: faaeb1eba307473032e2c2af737f36ced61fc98735608410d0a6d9c231b50912
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.14"
+    version: "0.2.0"
   flutter_localizations:
     dependency: transitive
     description: flutter
@@ -989,11 +989,10 @@ packages:
   table_calendar:
     dependency: "direct main"
     description:
-      name: table_calendar
-      sha256: "1e3521a3e6d3fc7f645a58b135ab663d458ab12504f1ea7f9b4b81d47086c478"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.9"
+      path: "customized_plugin/table_calendar-3.1.1"
+      relative: true
+    source: path
+    version: "3.1.1"
   term_glyph:
     dependency: transitive
     description:
