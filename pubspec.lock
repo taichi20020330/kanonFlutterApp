@@ -989,9 +989,10 @@ packages:
   table_calendar:
     dependency: "direct main"
     description:
-      path: "customized_plugin/table_calendar-3.1.1"
-      relative: true
-    source: path
+      name: table_calendar
+      sha256: b759eb6caa88dda8e51c70ee43c19d1682f8244458f84cced9138ee35b2ce416
+      url: "https://pub.dev"
+    source: hosted
     version: "3.1.1"
   term_glyph:
     dependency: transitive

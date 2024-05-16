@@ -8,11 +8,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kanon_app/%20model/work_notifier.dart';
+import 'package:kanon_app/customized_plugin/customization/calendar_builders.dart';
+import 'package:kanon_app/customized_plugin/customization/calendar_style.dart';
+import 'package:kanon_app/customized_plugin/shared/utils.dart';
+import 'package:kanon_app/customized_plugin/table_calendar.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/data/work.dart';
 import 'package:kanon_app/page/home.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../data/utils.dart';
 
 Map<DateTime, List<Work>> kEvents = {};
@@ -36,6 +39,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
+  Work? _work;
   List<Work> currentWorkList = [];
   int helperId = 0;
 
@@ -160,7 +164,9 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   Widget CalendarWidget() {
+    bool yetSubmitted = true;
     return TableCalendar<Work>(
+      
       locale: 'ja_JP',
       firstDay: kFirstDay,
       lastDay: kLastDay,
@@ -172,9 +178,25 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       rangeSelectionMode: _rangeSelectionMode,
       eventLoader: _getEventsForDay,
       startingDayOfWeek: StartingDayOfWeek.monday,
-      calendarStyle: const CalendarStyle(
+      
+      calendarBuilders: CalendarBuilders<Work>(
+      markerBuilder: (context, date, events) {
+        // eventsのreportIdが
+        yetSubmitted = false;
+        for(final event in events){
+          if(event.reportId != ""){
+            yetSubmitted = true;
+          }
+        }
+      },
+    ),
+    calendarStyle:  CalendarStyle(
         outsideDaysVisible: false,
+        markerDecoration: BoxDecoration(
+          color: (yetSubmitted == false) ? Colors.redAccent : const Color(0xFF263238),
+          shape: BoxShape.circle,)
       ),
+      
       onDaySelected: _onDaySelected,
       onRangeSelected: _onRangeSelected,
       onFormatChanged: (format) {
@@ -210,6 +232,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
         _focusedDay = focusedDay;
         _rangeStart = null; // Important to clean those
         _rangeEnd = null;
+        
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
 

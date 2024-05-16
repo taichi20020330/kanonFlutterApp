@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:kanon_app/data/work.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 
 import 'customization/calendar_builders.dart';
@@ -15,6 +16,8 @@ import 'shared/utils.dart';
 import 'table_calendar_base.dart';
 import 'widgets/calendar_header.dart';
 import 'widgets/cell_content.dart';
+
+
 
 /// Signature for `onDaySelected` callback. Contains the selected day and focused day.
 typedef OnDaySelected = void Function(
@@ -34,6 +37,8 @@ class TableCalendar<T> extends StatefulWidget {
   ///
   /// If nothing is provided, a default locale will be used.
   final dynamic locale;
+
+  late Work work;
 
   /// The start of the selected day range.
   final DateTime? rangeStartDay;
@@ -207,6 +212,7 @@ class TableCalendar<T> extends StatefulWidget {
   /// Creates a `TableCalendar` widget.
   TableCalendar({
     Key? key,
+    Work? work,
     required DateTime focusedDay,
     required DateTime firstDay,
     required DateTime lastDay,
@@ -259,7 +265,7 @@ class TableCalendar<T> extends StatefulWidget {
     this.onHeaderLongPressed,
     this.onPageChanged,
     this.onFormatChanged,
-    this.onCalendarCreated,
+    this.onCalendarCreated, 
   })  : assert(availableCalendarFormats.keys.contains(calendarFormat)),
         assert(availableCalendarFormats.length <= CalendarFormat.values.length),
         assert(weekendDays.isNotEmpty
@@ -275,6 +281,7 @@ class TableCalendar<T> extends StatefulWidget {
   @override
   _TableCalendarState<T> createState() => _TableCalendarState<T>();
 }
+
 
 class _TableCalendarState<T> extends State<TableCalendar<T>> {
   late final PageController _pageController;

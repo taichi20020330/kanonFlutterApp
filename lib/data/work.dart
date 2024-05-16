@@ -23,3 +23,4 @@ class Work with _$Work {
   factory Work.fromJson(Map<String, dynamic> json) =>
       _$WorkFromJson(json);
 }
+
