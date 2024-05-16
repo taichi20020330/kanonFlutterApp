@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart';
 import 'package:kanon_app/%20model/work_notifier.dart';
 import 'package:kanon_app/data/report.dart';
 
@@ -28,6 +29,7 @@ class ReportModel extends ChangeNotifier {
       'user': user,
       'description': description,
       'date': date,
+      'deleteFlag': false,
     });
   }
 
@@ -47,15 +49,17 @@ class ReportModel extends ChangeNotifier {
       'user': user,
       'description': description,
       'date': date,
+      'deleteFlag': false,
     });
 
     linkReportidWithWork(docId, workId);
   }
 
   void removeReport(Report report) {
-    FirebaseFirestore.instance.collection('reports').doc(report.id).delete();
+    FirebaseFirestore.instance.collection('reports').doc(report.id).update({
+      'deleteFlag': true,
+  });
   }
-
   void updateReport(String id, DateTime date, DateTime startTime,
       DateTime endTime, int? fee, String? description, int user) async {
     await FirebaseFirestore.instance.collection('reports').doc(id).update({

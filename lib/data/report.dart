@@ -10,8 +10,9 @@ class Report {
   final String? description;
   final DateTime date;
   final int user;
+  final bool deleteFlag;
 
-  Report({
+  const Report({
     required this.id,
     required this.startTime,
     required this.endTime,
@@ -20,5 +21,6 @@ class Report {
     required this.user,
     this.description,
     required this.date,
+    required this.deleteFlag
   });
 }

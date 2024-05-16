@@ -37,7 +37,8 @@ class Home extends HookConsumerWidget {
                           fee: doc['fee'],
                           user: doc['user'],
                           description: doc['description'],
-                          date: doc['date'].toDate()))
+                          date: doc['date'].toDate(),
+                          deleteFlag: doc['deleteFlag']))
                       .toList() ??
                   [];
 
@@ -63,7 +64,7 @@ class Home extends HookConsumerWidget {
                   ),
                   body: TabBarView(
                     children: groupedReports.entries.map((entry) {
-                      List<Report> sortedReports = entry.value.toList()
+                      List<Report> sortedReports = entry.value.where((report) => !report.deleteFlag).toList()
                         ..sort((a, b) => a.date.compareTo(b.date));
                       Duration totalWorkTime =
                           calculateTotalWorkTime(sortedReports);
