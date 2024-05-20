@@ -326,6 +326,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       fee: 0,
       description: "",
       user: work.userId,
+      deleteFlag: false,
     );
   }
 
