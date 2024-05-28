@@ -226,16 +226,18 @@ class FormPageState extends ConsumerState<FormPage> {
   _comfirmForm(BuildContext context) async {
     //idが存在する場合は編集
 
+    //TODO ここでのhelperは仮の値
+    const int helper = 1;
     if (mode == OpenFormPageMode.edit) {
       ref.read(reportListProvider.notifier).updateReport(currentReport!.id,
-          date, startTime!, endTime!, fee, description, selectedUser!.index);
+          date, startTime!, endTime!, fee, description, selectedUser!.index, helper);
     } else if (mode == OpenFormPageMode.add ) {
       ref.read(reportListProvider.notifier).addReport(
-          date, startTime!, endTime!, fee, description, selectedUser!.index);
+          date, startTime!, endTime!, fee, description, selectedUser!.index, helper);
     } else if(mode == OpenFormPageMode.workTap && workId != null) {
       print("addRelatedReport");
       ref.read(reportListProvider.notifier).addRelatedReport(
-          date, startTime!, endTime!, fee, description, selectedUser!.index, workId!);
+          date, startTime!, endTime!, fee, description, selectedUser!.index, helper, workId!);
 
     }
     if (_formKey.currentState!.validate()) {
