@@ -79,12 +79,18 @@ class ReportModel extends ChangeNotifier {
       // 指定された時間が15分単位で既に整っている場合はそのまま返す
       return time;
     } else {
-      int roundedMinutes = ((minutes + 7.5) / 15).round() * 15;
-      if (roundedMinutes >= 60) {
-        roundedMinutes -= 60;
+      // 繰上げを行うため、(minutes + 14) / 15 の整数部分を計算し、それを15倍することで15分単位に繰上げ
+      int roundedMinutes = ((minutes + 14) ~/ 15) * 15;
+      int hours = roundedMinutes ~/ 60;
+      int mins = roundedMinutes % 60;
+
+      // hoursが24以上の場合を考慮
+      if (hours >= 24) {
+        hours -= 24;
+        return DateTime(time.year, time.month, time.day + 1, hours, mins);
+      } else {
+        return DateTime(time.year, time.month, time.day, hours, mins);
       }
-      return DateTime(time.year, time.month, time.day, roundedMinutes ~/ 60,
-          roundedMinutes % 60);
     }
   }
 

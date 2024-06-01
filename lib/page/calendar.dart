@@ -8,14 +8,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kanon_app/%20model/work_notifier.dart';
-import 'package:kanon_app/customized_plugin/customization/calendar_builders.dart';
-import 'package:kanon_app/customized_plugin/customization/calendar_style.dart';
-import 'package:kanon_app/customized_plugin/shared/utils.dart';
-import 'package:kanon_app/customized_plugin/table_calendar.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/data/work.dart';
 import 'package:kanon_app/page/home.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../data/utils.dart';
 
 Map<DateTime, List<Work>> kEvents = {};
