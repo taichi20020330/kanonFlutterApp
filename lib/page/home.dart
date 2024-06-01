@@ -36,6 +36,7 @@ class Home extends HookConsumerWidget {
                           roundUpEndTime: doc['roundUpEndTime'].toDate(),
                           fee: doc['fee'],
                           user: doc['user'],
+                          helperId: doc['helperId'],
                           description: doc['description'],
                           date: doc['date'].toDate(),
                           deleteFlag: doc['deleteFlag']))

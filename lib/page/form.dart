@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -224,18 +225,20 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   _comfirmForm(BuildContext context) async {
-    //idが存在する場合は編集
+    
+    final auth = FirebaseAuth.instance;
+    final helperId = await auth.currentUser?.uid.toString() ?? ''; 
 
+    //idが存在する場合は編集
     if (mode == OpenFormPageMode.edit) {
       ref.read(reportListProvider.notifier).updateReport(currentReport!.id,
-          date, startTime!, endTime!, fee, description, selectedUser!.index);
+          date, startTime!, endTime!, fee, description, selectedUser!.index, helperId);
     } else if (mode == OpenFormPageMode.add ) {
       ref.read(reportListProvider.notifier).addReport(
-          date, startTime!, endTime!, fee, description, selectedUser!.index);
+          date, startTime!, endTime!, fee, description, selectedUser!.index, helperId);
     } else if(mode == OpenFormPageMode.workTap && workId != null) {
-      print("addRelatedReport");
       ref.read(reportListProvider.notifier).addRelatedReport(
-          date, startTime!, endTime!, fee, description, selectedUser!.index, workId!);
+          date, startTime!, endTime!, fee, description, selectedUser!.index, helperId, workId!);
 
     }
     if (_formKey.currentState!.validate()) {

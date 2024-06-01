@@ -10,6 +10,7 @@ class Report {
   final String? description;
   final DateTime date;
   final int user;
+  final String helperId;
   final bool deleteFlag;
 
   const Report({
@@ -19,6 +20,7 @@ class Report {
     required this.roundUpEndTime,
     this.fee,
     required this.user,
+    required this.helperId,
     this.description,
     required this.date,
     required this.deleteFlag

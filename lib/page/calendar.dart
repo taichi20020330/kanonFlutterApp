@@ -38,7 +38,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   DateTime? _rangeEnd;
   Work? _work;
   List<Work> currentWorkList = [];
-  int helperId = 0;
 
   @override
   void initState() {
@@ -46,14 +45,15 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     _selectedDay = _focusedDay;
     _initializeData();
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-    helperId = getHelperId();
   }
 
   Future<void> _initializeData() async {
+    final auth = FirebaseAuth.instance;
+    final helperId = await auth.currentUser?.uid.toString() ?? '';
     currentWorkList =
         await ref.read(workListNotifierProvider.notifier).updateWorkList();
     for (final work in currentWorkList) {
-      _addWorkToEventSource(work);
+      _addWorkToEventSource(work, helperId);
       _addEventSourceToCalendar();
     }
   }
@@ -256,16 +256,16 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     }
   }
 
-  void _addWorkToEventSource(Work work) {
+  void _addWorkToEventSource(Work work, String helperId) {
     final id = work.id;
     final date = work.date;
     final dateOnly = DateTime(date.year, date.month, date.day);
     final existingEvents = _kEventSource[dateOnly] ?? [];
-    final helperId = work.helperId;
+    final workHelperId = work.helperId;
 
     final isDuplicate =
         existingEvents.any((existingWork) => existingWork.id == id);
-    final isSameUser = helperId == this.helperId;
+    final isSameUser = workHelperId == helperId;
     if (!isDuplicate && isSameUser) {
       _kEventSource[dateOnly] = [...existingEvents, work];
     }
@@ -279,29 +279,15 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   void _refreshEventList(List<Work> works) async {
+    final auth = FirebaseAuth.instance;
+    final helperId = await auth.currentUser?.uid.toString() ?? '';
     for (final work in works) {
-      _addWorkToEventSource(work);
+      _addWorkToEventSource(work, helperId);
     }
     _addEventSourceToCalendar();
     setState(() {
       _selectedEvents.value = _getEventsForDay(_selectedDay!);
     });
-  }
-
-  // ユーザー情報を取得する関数
-  int getHelperId() {
-    int heplerId = 0;
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String uid = user!.uid;
-
-        heplerId = helperIdMappingList[uid] ?? 0;
-      }
-    } catch (e) {
-      print(e);
-    }
-    return heplerId;
   }
 
   void submitReportsFromCalendar(BuildContext context, Work work) {
@@ -323,6 +309,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       fee: 0,
       description: "",
       user: work.userId,
+      helperId: work.helperId,
       deleteFlag: false,
     );
   }

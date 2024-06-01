@@ -12,7 +12,7 @@ _$WorkImpl _$$WorkImplFromJson(Map<String, dynamic> json) => _$WorkImpl(
       scheduledStartTime: json['scheduledStartTime'] as int,
       scheduledEndTime: json['scheduledEndTime'] as int,
       userId: json['userId'] as int,
-      helperId: json['helperId'] as int,
+      helperId: json['helperId'] as String,
       reportId: json['reportId'] as String? ?? "",
     );
 
