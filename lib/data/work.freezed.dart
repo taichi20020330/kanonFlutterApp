@@ -25,7 +25,7 @@ mixin _$Work {
   int get scheduledStartTime => throw _privateConstructorUsedError;
   int get scheduledEndTime => throw _privateConstructorUsedError;
   int get userId => throw _privateConstructorUsedError;
-  int get helperId => throw _privateConstructorUsedError;
+  String get helperId => throw _privateConstructorUsedError;
   String get reportId => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,7 +44,7 @@ abstract class $WorkCopyWith<$Res> {
       int scheduledStartTime,
       int scheduledEndTime,
       int userId,
-      int helperId,
+      String helperId,
       String reportId});
 }
 
@@ -93,7 +93,7 @@ class _$WorkCopyWithImpl<$Res, $Val extends Work>
       helperId: null == helperId
           ? _value.helperId
           : helperId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       reportId: null == reportId
           ? _value.reportId
           : reportId // ignore: cast_nullable_to_non_nullable
@@ -115,7 +115,7 @@ abstract class _$$WorkImplCopyWith<$Res> implements $WorkCopyWith<$Res> {
       int scheduledStartTime,
       int scheduledEndTime,
       int userId,
-      int helperId,
+      String helperId,
       String reportId});
 }
 
@@ -161,7 +161,7 @@ class __$$WorkImplCopyWithImpl<$Res>
       helperId: null == helperId
           ? _value.helperId
           : helperId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       reportId: null == reportId
           ? _value.reportId
           : reportId // ignore: cast_nullable_to_non_nullable
@@ -196,7 +196,7 @@ class _$WorkImpl implements _Work {
   @override
   final int userId;
   @override
-  final int helperId;
+  final String helperId;
   @override
   @JsonKey()
   final String reportId;
@@ -250,7 +250,7 @@ abstract class _Work implements Work {
       required final int scheduledStartTime,
       required final int scheduledEndTime,
       required final int userId,
-      required final int helperId,
+      required final String helperId,
       final String reportId}) = _$WorkImpl;
 
   factory _Work.fromJson(Map<String, dynamic> json) = _$WorkImpl.fromJson;
@@ -266,7 +266,7 @@ abstract class _Work implements Work {
   @override
   int get userId;
   @override
-  int get helperId;
+  String get helperId;
   @override
   String get reportId;
   @override

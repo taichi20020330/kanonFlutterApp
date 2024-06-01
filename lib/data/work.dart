@@ -14,7 +14,7 @@ class Work with _$Work {
   required int scheduledStartTime,
   required int scheduledEndTime,
   required int userId,
-  required int helperId,
+  required String helperId,
   @Default("") String reportId
   }) = _Work;
 

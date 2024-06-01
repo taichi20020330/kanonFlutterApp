@@ -17,7 +17,7 @@ class ReportModel extends ChangeNotifier {
   }
 
   void addReport(DateTime date, DateTime startTime, DateTime endTime, int? fee,
-      String? description, int user, int helper) async {
+      String? description, int user, String helperId) async {
     await FirebaseFirestore.instance
         .collection('reports') // コレクションID指定
         .doc() // ドキュメントID自動生成
@@ -27,7 +27,7 @@ class ReportModel extends ChangeNotifier {
       'roundUpEndTime': roundTimeToNearest15Minutes(endTime),
       'fee': fee,
       'user': user,
-      'helper': helper,
+      'helperId': helperId,
       'description': description,
       'date': date,
       'deleteFlag': false,
@@ -35,7 +35,7 @@ class ReportModel extends ChangeNotifier {
   }
 
   void addRelatedReport(DateTime date, DateTime startTime, DateTime endTime,
-      int? fee, String? description, int user, int helper, String workId) async {
+      int? fee, String? description, int user, String helperId, String workId) async {
     final docRef = await FirebaseFirestore.instance
         .collection('reports') // コレクションID指定
         .doc(); // ドキュメントID自動生成
@@ -48,7 +48,7 @@ class ReportModel extends ChangeNotifier {
       'roundUpEndTime': roundTimeToNearest15Minutes(endTime),
       'fee': fee,
       'user': user,
-      'helper': helper,
+      'helperId': helperId,
       'description': description,
       'date': date,
       'deleteFlag': false,
@@ -63,14 +63,14 @@ class ReportModel extends ChangeNotifier {
   });
   }
   void updateReport(String id, DateTime date, DateTime startTime,
-      DateTime endTime, int? fee, String? description, int user, int helper) async {
+      DateTime endTime, int? fee, String? description, int user, String helperId) async {
     await FirebaseFirestore.instance.collection('reports').doc(id).update({
       'startTime': startTime,
       'endTime': endTime,
       'roundUpEndTime': roundTimeToNearest15Minutes(endTime),
       'fee': fee,
       'user': user,
-      'helper' : helper,
+      'helperId' : helperId,
       'description': description,
       'date': date,
     });
