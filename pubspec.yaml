@@ -59,6 +59,7 @@ dependencies:
   go_router: ^13.0.0
   go_router_builder: ^2.4.0
   firebase_auth: ^4.16.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +70,11 @@ dev_dependencies:
   custom_lint: ^0.5.7
   riverpod_lint: ^2.3.7
   json_serializable: ^6.7.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/kanon.png"
 
 dependency_overrides:
   intl: any
@@ -83,6 +89,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

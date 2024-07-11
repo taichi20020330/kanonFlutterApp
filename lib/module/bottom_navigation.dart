@@ -38,7 +38,7 @@ class BottomNavigationPage extends ConsumerWidget {
     return Scaffold(
       body: bodyWidget,
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color.fromARGB(255, 130, 104, 175),
+        selectedItemColor:  Colors.red[300],
         unselectedItemColor: Colors.grey,
         currentIndex: PageType.values.indexOf(currentPage),
         items: const [

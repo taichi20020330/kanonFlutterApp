@@ -33,6 +33,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
   DateTime _focusedDay = DateTime.now();
+  DateTime today = DateTime.now();
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
@@ -165,7 +166,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     return TableCalendar<Work>(
       
       locale: 'ja_JP',
-      firstDay: kFirstDay,
+      firstDay: DateTime(kToday.year, kToday.month - 2, kToday.day),
       lastDay: kLastDay,
       focusedDay: _focusedDay,
       selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -175,7 +176,6 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       rangeSelectionMode: _rangeSelectionMode,
       eventLoader: _getEventsForDay,
       startingDayOfWeek: StartingDayOfWeek.monday,
-      
       calendarBuilders: CalendarBuilders<Work>(
       markerBuilder: (context, date, events) {
         // eventsのreportIdが

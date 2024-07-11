@@ -22,7 +22,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('ログイン'),
-        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Container(

@@ -156,10 +156,6 @@ class FormPageState extends ConsumerState<FormPage> {
     return DropdownMenu<UserLabel>(
       initialSelection: label,
       controller: userController,
-      // requestFocusOnTap is enabled/disabled by platforms when it is null.
-      // On mobile platforms, this is false by default. Setting this to true will
-      // trigger focus request on the text field and virtual keyboard will appear
-      // afterward. On desktop platforms however, this defaults to true.
       requestFocusOnTap: true,
       label: const Text('利用者'),
       onSelected: (UserLabel? user) {
@@ -253,7 +249,8 @@ class FormPageState extends ConsumerState<FormPage> {
     if (timeLabel == TimeLabel.startTime) {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.now(),
+        initialTime: (startTime != null) ? TimeOfDay.fromDateTime(startTime!) : TimeOfDay.now(),
+        // initialTime: TimeOfDay.fromDateTime(startTime),
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -269,7 +266,7 @@ class FormPageState extends ConsumerState<FormPage> {
     } else {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.now(),
+        initialTime: (endTime != null) ? TimeOfDay.fromDateTime(endTime!) : TimeOfDay.now(),
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),

@@ -80,7 +80,6 @@ class Home extends HookConsumerWidget {
                           SalaryText(monthlySalary),
                           for (var report in sortedReports) ...[
                             if (sortedReports.indexOf(report) > 0)
-                              const Divider(height: 0),
                             ProviderScope(
                               overrides: [
                                 _currentReport.overrideWithValue(report),
@@ -169,7 +168,7 @@ class ReportItem extends HookConsumerWidget {
     String formattedDate = DateFormat('yyyy年MM月dd日').format(report.date);
 
     return Material(
-      child: Card(
+        child: Card(
         child: ListTile(
           title: Text(
             selectUser(report.user),
@@ -183,21 +182,13 @@ class ReportItem extends HookConsumerWidget {
   }
 
   String selectUser(int userNumber) {
-    switch (userNumber) {
-      case 0:
-        return '戸松さん';
-      case 1:
-        return '吉田さん';
-      case 2:
-        return '岡本さん';
-      case 3:
-        return '秋谷さん';
-      case 4:
-        return '前田さん';
-      default:
-        return '戸松さん';
+    if (userNumber >= 0 && userNumber <= 30) {
+      return UserLabel.values[userNumber].label;
+    } else {
+      return UserLabel.user0.label; // デフォルトの値
     }
   }
+
 
   String formatTime(DateTime time) {
     // intlパッケージを使用して24時間形式でフォーマット

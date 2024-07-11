@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (snapshot.hasData) {
           // ログインしている場合の表示するウィジェット
-          return const MaterialApp(
+          return  MaterialApp(
             localizationsDelegates: [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -70,12 +70,25 @@ class MyApp extends StatelessWidget {
             locale: Locale('ja'),
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
+            theme: ThemeData(
+              colorScheme:  const ColorScheme(
+                primary: Color(0xFFEF9A9A),  // 薄いピンク
+                secondary: Color(0xFFE57373),  // 少し濃いピンク
+                surface: Colors.white,
+                error: Colors.red,
+                onPrimary: Colors.black,
+                onSecondary: Colors.black,
+                onSurface: Colors.black,
+                onError: Colors.white,
+                brightness: Brightness.light,
+              ),
+            ),
             home: BottomNavigationPage(),
           );
         } else {
           // ログインしていない場合の表示するウィジェット
-          return const MaterialApp(
-            localizationsDelegates: [
+          return  const MaterialApp(
+            localizationsDelegates:  [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
@@ -86,6 +99,7 @@ class MyApp extends StatelessWidget {
             locale: Locale('ja'),
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
+
             home: LoginPage(),
           );
         }
