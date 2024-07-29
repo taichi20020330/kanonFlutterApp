@@ -5,6 +5,7 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/data/work.dart';
 
 
@@ -70,4 +71,21 @@ int extractTimeFromTimestamp(Timestamp timestamp) {
   int time = dateTime.hour * 100 + dateTime.minute;
 
   return time;
+}
+
+
+Duration calculateTotalWorkTime(List<Report> reports) {
+  return reports.fold(Duration.zero, (previous, report) {
+    DateTime startTime =
+        DateTime(2023, 1, 1, report.startTime.hour, report.startTime.minute);
+    DateTime endTime = DateTime(
+        2023, 1, 1, report.roundUpEndTime.hour, report.roundUpEndTime.minute);
+    return previous + endTime.difference(startTime);
+  });
+}
+
+double calculateMonthlySalary(Duration totalWorkTime) {
+  const hourlyWage = 1200.0; // 時給
+  double totalWorkHours = totalWorkTime.inMinutes / 60.0;
+  return totalWorkHours * hourlyWage;
 }

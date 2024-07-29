@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanon_app/page/calendar.dart';
 import 'package:kanon_app/data/enum.dart';
-import 'package:kanon_app/page/home.dart';
+import 'package:kanon_app/page/report_list_page.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/page/logout.dart';
 
@@ -19,7 +19,7 @@ class BottomNavigationPage extends ConsumerWidget {
     switch (currentPage) {
       case PageType.Report:
         appBarTitle = "Report";
-        bodyWidget = Home();
+        bodyWidget = ReportListPage();
         break;
       case PageType.Calendar:
         appBarTitle = "Calendar";

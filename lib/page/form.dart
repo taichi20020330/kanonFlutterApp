@@ -31,6 +31,9 @@ class FormPageState extends ConsumerState<FormPage> {
   String description = '';
   String? id;
   int fee = 0;
+  String origin = '';
+  String destination = '';
+  bool isRoundTrip = false;
   DateTime date = DateTime.now();
   double maxValue = 0;
   bool? brushedTeeth = false;
@@ -54,7 +57,7 @@ class FormPageState extends ConsumerState<FormPage> {
       fee = currentReport!.fee!;
       description = currentReport!.description!;
       selectedUser = UserLabel.values[currentReport!.user];
-    } else if(mode == OpenFormPageMode.workTap) {
+    } else if (mode == OpenFormPageMode.workTap) {
       currentReport = widget.currentReport;
       id = currentReport?.id;
       date = currentReport!.date;
@@ -65,7 +68,6 @@ class FormPageState extends ConsumerState<FormPage> {
       selectedUser = UserLabel.values[currentReport!.user];
       workId = widget.workId;
     }
-
 
     // "ref" can be used in all life-cycles of a StatefulWidget.
     ref.read(reportListProvider);
@@ -106,6 +108,7 @@ class FormPageState extends ConsumerState<FormPage> {
                             context, TimeSelectButtonMode.endTimeMode),
                         UserLabelButton(selectedUser),
                         FeeTextField(),
+                        RootTextField(),
                         DescriptionTextField(),
                         RegisterButton(),
                       ].expand(
@@ -188,19 +191,77 @@ class FormPageState extends ConsumerState<FormPage> {
       text: fee.toString(),
     );
 
-    return TextField(
-      controller: controller,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      keyboardType: TextInputType.number,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
-        hintText: '340',
-        labelText: '交通費',
-      ),
-      onChanged: (value) {
-        fee = int.parse(value);
-      },
+    return Column(
+      children: [
+        TextField(
+          controller: controller,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            filled: true,
+            hintText: '340',
+            labelText: '交通手当',
+          ),
+          onChanged: (value) {
+            fee = int.parse(value);
+          },
+        ),
+      ],
+    );
+  }
+
+  RootTextField() {
+    final TextEditingController origin_controller = TextEditingController(
+      text: origin.toString(),
+    );
+    final TextEditingController destination_controller = TextEditingController(
+      text: destination.toString(),
+    );
+
+    const List<String> trip_list = <String>['片道', '往復'];
+    String dropdownValue = trip_list.first;
+
+    return Row(
+      children: [
+        SizedBox(
+          width: 80,
+          child: TextField(
+              controller: origin_controller,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '出発地',
+              )),
+        ),
+        SizedBox(width: 20), // ここで間隔を追加
+        SizedBox(
+            width: 120,
+            child: DropdownMenu<String>(
+              initialSelection: trip_list.first,
+              onSelected: (String? value) {
+                // This is called when the user selects an item.
+                setState(() {
+                  dropdownValue = value!;
+                });
+              },
+              dropdownMenuEntries:
+                  trip_list.map<DropdownMenuEntry<String>>((String value) {
+                return DropdownMenuEntry<String>(value: value, label: value);
+              }).toList(),
+            )),
+        SizedBox(width: 20), // ここで間隔を追加
+        SizedBox(
+          width: 80,
+          child: TextField(
+              controller: destination_controller,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '到着地',
+              )),
+        )
+      ],
     );
   }
 
@@ -221,35 +282,50 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   _comfirmForm(BuildContext context) async {
-    
     final auth = FirebaseAuth.instance;
-    final helperId = await auth.currentUser?.uid.toString() ?? ''; 
+    final helperId = await auth.currentUser?.uid.toString() ?? '';
 
     //idが存在する場合は編集
     if (mode == OpenFormPageMode.edit) {
-      ref.read(reportListProvider.notifier).updateReport(currentReport!.id,
-          date, startTime!, endTime!, fee, description, selectedUser!.index, helperId);
-    } else if (mode == OpenFormPageMode.add ) {
-      ref.read(reportListProvider.notifier).addReport(
-          date, startTime!, endTime!, fee, description, selectedUser!.index, helperId);
-    } else if(mode == OpenFormPageMode.workTap && workId != null) {
-      ref.read(reportListProvider.notifier).addRelatedReport(
-          date, startTime!, endTime!, fee, description, selectedUser!.index, helperId, workId!);
+      ref.read(reportListProvider.notifier).updateReport(
+          currentReport!.id,
+          date,
+          startTime!,
+          endTime!,
+          fee,
+          description,
+          selectedUser!.index,
+          helperId);
+    } else if (mode == OpenFormPageMode.add) {
+      ref.read(reportListProvider.notifier).addReport(date, startTime!,
+          endTime!, fee, description, selectedUser!.index, helperId);
+    } else if (mode == OpenFormPageMode.workTap && workId != null) {
+      ref.read(reportListProvider.notifier).addRelatedReport(date, startTime!,
+          endTime!, fee, description, selectedUser!.index, helperId, workId!);
+    }
 
-    }
-    if (_formKey.currentState!.validate()) {
+    // isCorrectTimeがfalseの場合はエラーを表示
+    if (!isCorrectTime(startTime!, endTime!)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Processing Data')),
+        const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
       );
+    } else {
+      if (_formKey.currentState!.validate()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('登録しました')),
+        );
+      }
+      Navigator.pop(context);
     }
-    Navigator.pop(context);
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {
     if (timeLabel == TimeLabel.startTime) {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
-        initialTime: (startTime != null) ? TimeOfDay.fromDateTime(startTime!) : TimeOfDay.now(),
+        initialTime: (startTime != null)
+            ? TimeOfDay.fromDateTime(startTime!)
+            : TimeOfDay.now(),
         // initialTime: TimeOfDay.fromDateTime(startTime),
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
@@ -266,7 +342,9 @@ class FormPageState extends ConsumerState<FormPage> {
     } else {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
-        initialTime: (endTime != null) ? TimeOfDay.fromDateTime(endTime!) : TimeOfDay.now(),
+        initialTime: (endTime != null)
+            ? TimeOfDay.fromDateTime(endTime!)
+            : TimeOfDay.now(),
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -281,6 +359,10 @@ class FormPageState extends ConsumerState<FormPage> {
       }
     }
   }
+}
+
+bool isCorrectTime(DateTime startTime, DateTime endTime) {
+  return startTime.isBefore(endTime) && (startTime != endTime);
 }
 
 class _FormDatePicker extends StatefulWidget {

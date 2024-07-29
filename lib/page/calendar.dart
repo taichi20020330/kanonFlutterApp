@@ -11,7 +11,7 @@ import 'package:kanon_app/%20model/work_notifier.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/data/work.dart';
-import 'package:kanon_app/page/home.dart';
+import 'package:kanon_app/page/report_list_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../data/utils.dart';
 
