@@ -26,7 +26,7 @@ mixin _$Work {
   int get scheduledEndTime => throw _privateConstructorUsedError;
   int get userId => throw _privateConstructorUsedError;
   String get helperId => throw _privateConstructorUsedError;
-  String get reportId => throw _privateConstructorUsedError;
+  bool get isReported => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -45,7 +45,7 @@ abstract class $WorkCopyWith<$Res> {
       int scheduledEndTime,
       int userId,
       String helperId,
-      String reportId});
+      bool isReported});
 }
 
 /// @nodoc
@@ -67,7 +67,7 @@ class _$WorkCopyWithImpl<$Res, $Val extends Work>
     Object? scheduledEndTime = null,
     Object? userId = null,
     Object? helperId = null,
-    Object? reportId = null,
+    Object? isReported = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -94,10 +94,10 @@ class _$WorkCopyWithImpl<$Res, $Val extends Work>
           ? _value.helperId
           : helperId // ignore: cast_nullable_to_non_nullable
               as String,
-      reportId: null == reportId
-          ? _value.reportId
-          : reportId // ignore: cast_nullable_to_non_nullable
-              as String,
+      isReported: null == isReported
+          ? _value.isReported
+          : isReported // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -116,7 +116,7 @@ abstract class _$$WorkImplCopyWith<$Res> implements $WorkCopyWith<$Res> {
       int scheduledEndTime,
       int userId,
       String helperId,
-      String reportId});
+      bool isReported});
 }
 
 /// @nodoc
@@ -135,7 +135,7 @@ class __$$WorkImplCopyWithImpl<$Res>
     Object? scheduledEndTime = null,
     Object? userId = null,
     Object? helperId = null,
-    Object? reportId = null,
+    Object? isReported = null,
   }) {
     return _then(_$WorkImpl(
       id: null == id
@@ -162,10 +162,10 @@ class __$$WorkImplCopyWithImpl<$Res>
           ? _value.helperId
           : helperId // ignore: cast_nullable_to_non_nullable
               as String,
-      reportId: null == reportId
-          ? _value.reportId
-          : reportId // ignore: cast_nullable_to_non_nullable
-              as String,
+      isReported: null == isReported
+          ? _value.isReported
+          : isReported // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -180,7 +180,7 @@ class _$WorkImpl implements _Work {
       required this.scheduledEndTime,
       required this.userId,
       required this.helperId,
-      this.reportId = ""});
+      required this.isReported});
 
   factory _$WorkImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkImplFromJson(json);
@@ -198,12 +198,11 @@ class _$WorkImpl implements _Work {
   @override
   final String helperId;
   @override
-  @JsonKey()
-  final String reportId;
+  final bool isReported;
 
   @override
   String toString() {
-    return 'Work(id: $id, date: $date, scheduledStartTime: $scheduledStartTime, scheduledEndTime: $scheduledEndTime, userId: $userId, helperId: $helperId, reportId: $reportId)';
+    return 'Work(id: $id, date: $date, scheduledStartTime: $scheduledStartTime, scheduledEndTime: $scheduledEndTime, userId: $userId, helperId: $helperId, isReported: $isReported)';
   }
 
   @override
@@ -220,14 +219,14 @@ class _$WorkImpl implements _Work {
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.helperId, helperId) ||
                 other.helperId == helperId) &&
-            (identical(other.reportId, reportId) ||
-                other.reportId == reportId));
+            (identical(other.isReported, isReported) ||
+                other.isReported == isReported));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, date, scheduledStartTime,
-      scheduledEndTime, userId, helperId, reportId);
+      scheduledEndTime, userId, helperId, isReported);
 
   @JsonKey(ignore: true)
   @override
@@ -251,7 +250,7 @@ abstract class _Work implements Work {
       required final int scheduledEndTime,
       required final int userId,
       required final String helperId,
-      final String reportId}) = _$WorkImpl;
+      required final bool isReported}) = _$WorkImpl;
 
   factory _Work.fromJson(Map<String, dynamic> json) = _$WorkImpl.fromJson;
 
@@ -268,7 +267,7 @@ abstract class _Work implements Work {
   @override
   String get helperId;
   @override
-  String get reportId;
+  bool get isReported;
   @override
   @JsonKey(ignore: true)
   _$$WorkImplCopyWith<_$WorkImpl> get copyWith =>

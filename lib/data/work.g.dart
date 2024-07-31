@@ -13,7 +13,7 @@ _$WorkImpl _$$WorkImplFromJson(Map<String, dynamic> json) => _$WorkImpl(
       scheduledEndTime: json['scheduledEndTime'] as int,
       userId: json['userId'] as int,
       helperId: json['helperId'] as String,
-      reportId: json['reportId'] as String? ?? "",
+      isReported: json['isReported'] as bool,
     );
 
 Map<String, dynamic> _$$WorkImplToJson(_$WorkImpl instance) =>
@@ -24,5 +24,5 @@ Map<String, dynamic> _$$WorkImplToJson(_$WorkImpl instance) =>
       'scheduledEndTime': instance.scheduledEndTime,
       'userId': instance.userId,
       'helperId': instance.helperId,
-      'reportId': instance.reportId,
+      'isReported': instance.isReported,
     };

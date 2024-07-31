@@ -79,47 +79,50 @@ class FormPageState extends ConsumerState<FormPage> {
       appBar: AppBar(
         title: const Text('仕事の記録'),
       ),
-      body: Form(
-        key: _formKey,
-        child: Scrollbar(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Card(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...[
-                        _FormDatePicker(
-                          date: date,
-                          onChanged: (value) {
-                            setState(() {
-                              date = value;
-                            });
-                          },
-                        ),
-                        TimeSelectButton(
-                            context, TimeSelectButtonMode.startTimeMode),
-                        TimeSelectButton(
-                            context, TimeSelectButtonMode.endTimeMode),
-                        UserLabelButton(selectedUser),
-                        FeeTextField(),
-                        RootTextField(),
-                        DescriptionTextField(),
-                        RegisterButton(),
-                      ].expand(
-                        (widget) => [
-                          widget,
-                          const SizedBox(
-                            height: 24,
-                          )
-                        ],
-                      )
-                    ],
+      body: GestureDetector(
+        onTap: () => primaryFocus?.unfocus(),
+        child: Form(
+          key: _formKey,
+          child: Scrollbar(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Card(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...[
+                          _FormDatePicker(
+                            date: date,
+                            onChanged: (value) {
+                              setState(() {
+                                date = value;
+                              });
+                            },
+                          ),
+                          TimeSelectButton(
+                              context, TimeSelectButtonMode.startTimeMode),
+                          TimeSelectButton(
+                              context, TimeSelectButtonMode.endTimeMode),
+                          UserLabelButton(selectedUser),
+                          FeeTextField(),
+                          RootTextField(),
+                          DescriptionTextField(),
+                          RegisterButton(),
+                        ].expand(
+                          (widget) => [
+                            widget,
+                            const SizedBox(
+                              height: 24,
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -212,12 +215,9 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   RootTextField() {
-    final TextEditingController origin_controller = TextEditingController(
-      text: origin.toString(),
-    );
-    final TextEditingController destination_controller = TextEditingController(
-      text: destination.toString(),
-    );
+    final TextEditingController origin_controller = TextEditingController();
+    final TextEditingController destination_controller =
+        TextEditingController();
 
     const List<String> trip_list = <String>['片道', '往復'];
     String dropdownValue = trip_list.first;
@@ -227,14 +227,17 @@ class FormPageState extends ConsumerState<FormPage> {
         SizedBox(
           width: 80,
           child: TextField(
-              controller: origin_controller,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '出発地',
-              )),
+            controller: origin_controller,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: '出発地',
+            ),
+            onChanged: (value) {
+              origin = value;
+            },
+          ),
         ),
-        SizedBox(width: 20), // ここで間隔を追加
+        const SizedBox(width: 20), // ここで間隔を追加
         SizedBox(
             width: 120,
             child: DropdownMenu<String>(
@@ -250,16 +253,19 @@ class FormPageState extends ConsumerState<FormPage> {
                 return DropdownMenuEntry<String>(value: value, label: value);
               }).toList(),
             )),
-        SizedBox(width: 20), // ここで間隔を追加
+        const SizedBox(width: 20), // ここで間隔を追加
         SizedBox(
           width: 80,
           child: TextField(
-              controller: destination_controller,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '到着地',
-              )),
+            controller: destination_controller,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: '到着地',
+            ),
+            onChanged: (value) {
+              destination = value;
+            },
+          ),
         )
       ],
     );
@@ -282,8 +288,25 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   _comfirmForm(BuildContext context) async {
+    // isCorrectTimeがfalseの場合はエラーを表示
+    if (!isCorrectTime(startTime!, endTime!)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
+      );
+    } else {
+      if (_formKey.currentState!.validate()) {
+        addReportToFirebase();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('登録しました')),
+        );
+      }
+      Navigator.pop(context);
+    }
+  }
+
+  void addReportToFirebase() {
     final auth = FirebaseAuth.instance;
-    final helperId = await auth.currentUser?.uid.toString() ?? '';
+    final helperId = auth.currentUser?.uid.toString() ?? '';
 
     //idが存在する場合は編集
     if (mode == OpenFormPageMode.edit) {
@@ -303,66 +326,47 @@ class FormPageState extends ConsumerState<FormPage> {
       ref.read(reportListProvider.notifier).addRelatedReport(date, startTime!,
           endTime!, fee, description, selectedUser!.index, helperId, workId!);
     }
-
-    // isCorrectTimeがfalseの場合はエラーを表示
-    if (!isCorrectTime(startTime!, endTime!)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
-      );
-    } else {
-      if (_formKey.currentState!.validate()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('登録しました')),
-        );
-      }
-      Navigator.pop(context);
-    }
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {
+    DateTime? selectTime;
+
     if (timeLabel == TimeLabel.startTime) {
-      final TimeOfDay? picked = await showTimePicker(
-        context: context,
-        initialTime: (startTime != null)
-            ? TimeOfDay.fromDateTime(startTime!)
-            : TimeOfDay.now(),
-        // initialTime: TimeOfDay.fromDateTime(startTime),
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child!,
-          );
-        },
-      );
-      if (picked != null && picked != startTime) {
-        setState(() {
-          startTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
-        });
-      }
+      selectTime = startTime;
     } else {
-      final TimeOfDay? picked = await showTimePicker(
-        context: context,
-        initialTime: (endTime != null)
-            ? TimeOfDay.fromDateTime(endTime!)
-            : TimeOfDay.now(),
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child!,
-          );
-        },
-      );
-      if (picked != null && picked != endTime) {
-        setState(() {
-          endTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
-        });
-      }
+      selectTime = endTime;
+    }
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: (selectTime != null)
+          ? TimeOfDay.fromDateTime(selectTime!)
+          : TimeOfDay.now(),
+      // initialTime: TimeOfDay.fromDateTime(startTime),
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != selectTime) {
+      setState(() {
+        selectTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
+      });
     }
   }
 }
 
 bool isCorrectTime(DateTime startTime, DateTime endTime) {
-  return startTime.isBefore(endTime) && (startTime != endTime);
+  bool isCorrectTime = true;
+  if (startTime.isAfter(endTime)) {
+    isCorrectTime = false;
+  }
+  if (startTime == endTime) {
+    isCorrectTime = false;
+  }
+  return isCorrectTime;
 }
 
 class _FormDatePicker extends StatefulWidget {

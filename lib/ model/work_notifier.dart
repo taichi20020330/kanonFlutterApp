@@ -23,7 +23,7 @@ class WorkListNotifier extends _$WorkListNotifier {
   Future<List<Work>> fetchWorkListfromFirestore() async {
     // Firestoreからデータを取得
     QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('work').get();
+        await FirebaseFirestore.instance.collection('works').get();
 
     // データをWorkオブジェクトのリストに変換
     works = snapshot.docs.map((doc) {
@@ -42,7 +42,7 @@ class WorkListNotifier extends _$WorkListNotifier {
         'scheduledEndTime': end,
         'userId': data['userId'],
         'helperId': data['helperId'],
-        'reportId': data['reportId']
+        'isReported': data['isReported']
       });
     }).toList();
     state = AsyncValue.data(works);
@@ -58,11 +58,18 @@ class WorkListNotifier extends _$WorkListNotifier {
   }
 
 
-  void linkReportidWithWork(String reportId, String workId) async {
-    await FirebaseFirestore.instance.collection('work').doc(workId).update({
-      'reportId':  reportId
+  void updateIsReportedOfFirebaseWorks(String workId) async {
+    await FirebaseFirestore.instance.collection('works').doc(workId).update({
+      'isReported': true
     });
   }
+
+
+  // void linkReportidWithWork(String reportId, String workId) async {
+  //   await FirebaseFirestore.instance.collection('works').doc(workId).update({
+  //     'reportId':  reportId
+  //   });
+  // }
 
 
 }

@@ -54,7 +54,7 @@ class ReportModel extends ChangeNotifier {
       'deleteFlag': false,
     });
 
-    linkReportidWithWork(docId, workId);
+    // linkReportidWithWork(docId, workId);
   }
 
   void removeReport(Report report) {
@@ -97,8 +97,8 @@ class ReportModel extends ChangeNotifier {
     }
   }
 
-  void linkReportidWithWork (String reportId, String workId) {
-    // fetchWorkFromId
-    workListProvider.linkReportidWithWork(reportId, workId);
-  }
+  // void linkReportidWithWork (String reportId, String workId) {
+  //   // fetchWorkFromId
+  //   workListProvider.linkReportidWithWork(reportId, workId);
+  // }
 }

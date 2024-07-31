@@ -118,7 +118,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
             itemCount: value.length,
             itemBuilder: (context, index) {
               final work = value[index];
-              bool isAttached = work.reportId != "";
+              bool isReported= work.isReported;
               print(work.id);
               return Container(
                 margin: const EdgeInsets.symmetric(
@@ -138,7 +138,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
                   subtitle: Text(
                     '${convertToTimeFormat(work.scheduledStartTime)} - ${convertToTimeFormat(work.scheduledEndTime)}',
                   ),
-                  trailing: (isAttached)
+                  trailing: (isReported)
                       ? const Icon(
                           Icons.content_copy,
                           // 薄い赤色
@@ -162,7 +162,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   Widget CalendarWidget() {
-    bool yetSubmitted = true;
+    Color makerColor = Colors.redAccent;
     return TableCalendar<Work>(
       
       locale: 'ja_JP',
@@ -179,10 +179,15 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       calendarBuilders: CalendarBuilders<Work>(
       markerBuilder: (context, date, events) {
         // eventsのreportIdが
-        yetSubmitted = false;
         for(final event in events){
-          if(event.reportId != ""){
-            yetSubmitted = true;
+          if(event.isReported){
+            return  Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF263238),
+                  shape: BoxShape.circle
+                ));
           }
         }
       },
@@ -190,7 +195,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     calendarStyle:  CalendarStyle(
         outsideDaysVisible: false,
         markerDecoration: BoxDecoration(
-          color: (yetSubmitted == false) ? Colors.redAccent : const Color(0xFF263238),
+          color: makerColor,
           shape: BoxShape.circle,)
       ),
       
@@ -292,6 +297,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
   void submitReportsFromCalendar(BuildContext context, Work work) {
     final report = convertReportFromWork(work);
+    updateIsReportedOfFirebaseWorks(work.id);
     openFormPage(context, OpenFormPageMode.workTap, report, work.id);
   }
 
@@ -319,5 +325,10 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
     int minutes = time % 100; // 分を取得
 
     return DateTime(date.year, date.month, date.day, hours, minutes);
+  }
+
+  void updateIsReportedOfFirebaseWorks(String workId) {
+    final workListNotifier = ref.read(workListNotifierProvider.notifier);
+    workListNotifier.updateIsReportedOfFirebaseWorks(workId);
   }
 }
