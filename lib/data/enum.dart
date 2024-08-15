@@ -98,7 +98,7 @@ enum TimeSelectButtonMode {
 
 enum PageType {
   Report,
+  Logout,
   Calendar,
   Settings,
-  Logout,
 }
