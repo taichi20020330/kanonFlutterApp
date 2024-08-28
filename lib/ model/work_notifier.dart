@@ -14,7 +14,6 @@ part 'work_notifier.g.dart';
 class WorkListNotifier extends _$WorkListNotifier {
   List<Work> works = [];
 
-
   @override
   Future<List<Work>> build() async {
     return fetchWorkListfromFirestore();
@@ -63,13 +62,5 @@ class WorkListNotifier extends _$WorkListNotifier {
       'isReported': true
     });
   }
-
-
-  // void linkReportidWithWork(String reportId, String workId) async {
-  //   await FirebaseFirestore.instance.collection('works').doc(workId).update({
-  //     'reportId':  reportId
-  //   });
-  // }
-
 
 }

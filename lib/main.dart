@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:kanon_app/data/riverpod_providers.dart';
 import 'package:kanon_app/module/bottom_navigation.dart';
 import 'package:kanon_app/data/enum.dart';
-import 'package:kanon_app/data/provider.dart';
+import 'package:kanon_app/data/providers.dart';
 import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/%20model/report_model.dart';
 import 'package:kanon_app/page/login.dart';
@@ -24,7 +25,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -32,28 +32,17 @@ void main() async {
   );
 }
 
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
+
+
+
   @override
   Widget build(BuildContext context) {
-    // return const MaterialApp(
-    //   localizationsDelegates: [
-    //     GlobalMaterialLocalizations.delegate,
-    //     GlobalWidgetsLocalizations.delegate,
-    //     GlobalCupertinoLocalizations.delegate,
-    //   ],
-    //   supportedLocales: [
-    //     Locale('ja'),
-    //   ],
-    //   locale: Locale('ja'),
-    //   debugShowCheckedModeBanner: false,
-    //   title: 'Flutter Demo',
-    //   home: LoginPage(),
-    // );
     return StreamBuilder(
-      
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (snapshot.hasData) {

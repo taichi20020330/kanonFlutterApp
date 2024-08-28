@@ -7,6 +7,7 @@ import 'package:kanon_app/data/utils.dart';
 import 'package:kanon_app/page/form.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
+import 'package:kanon_app/repository/user_manager.dart';
 
 class ReportListPage extends ConsumerStatefulWidget {
   @override
@@ -22,6 +23,9 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
   @override
   void initState() {
     super.initState();
+    UserManager().initializeUsers().then((_) {
+      setState(() {}); // 必要に応じて状態を更新
+    });
   }
 
   @override
@@ -204,9 +208,9 @@ class ReportItem extends HookConsumerWidget {
 
   String selectUser(int userNumber) {
     if (userNumber >= 0 && userNumber <= 30) {
-      return UserLabel.values[userNumber].label;
+      return UserManager().getUserName(userNumber);
     } else {
-      return UserLabel.user0.label; // デフォルトの値
+      return "papapapa"; // デフォルトの値
     }
   }
 

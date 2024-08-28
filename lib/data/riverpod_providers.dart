@@ -1,8 +1,6 @@
-
-import 'dart:convert';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kanon_app/data/enum.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 
 class PageNotifier extends Notifier<PageType> {
   @override
@@ -15,4 +13,3 @@ class PageNotifier extends Notifier<PageType> {
     state = pageType;
   }
 }
-

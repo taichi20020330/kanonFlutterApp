@@ -37,6 +37,7 @@ class _LogoutPageState extends ConsumerState<LogoutPage> {
               const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                   child: Text('利用者さんリストの編集')),
+              
             ],
           ),
         ),

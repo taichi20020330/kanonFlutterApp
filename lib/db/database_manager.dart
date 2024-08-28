@@ -1,8 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:kanon_app/data/user.dart';
-
-
 
 class DatabaseManager {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
