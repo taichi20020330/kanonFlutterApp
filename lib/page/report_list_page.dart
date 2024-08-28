@@ -121,7 +121,7 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
             WorkTimeText(totalWorkTime),
             SalaryText(monthlySalary),
             for (var report in sortedReports) ...[
-              if (sortedReports.indexOf(report) > 0)
+              if (sortedReports.contains(report))
                 ProviderScope(
                   overrides: [
                     _currentReport.overrideWithValue(report),
