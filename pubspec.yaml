@@ -60,6 +60,7 @@ dependencies:
   go_router_builder: ^2.4.0
   firebase_auth: ^4.16.0
   flutter_launcher_icons: ^0.13.1
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

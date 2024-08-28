@@ -6,11 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanon_app/repository/user_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
-import 'package:kanon_app/%20model/report_model.dart';
 
 class FormPage extends ConsumerStatefulWidget {
   FormPage({required this.mode, this.currentReport, this.workId, super.key});
@@ -25,7 +25,7 @@ class FormPage extends ConsumerStatefulWidget {
 class FormPageState extends ConsumerState<FormPage> {
   final TextEditingController userController = TextEditingController();
 
-  UserLabel selectedUser = UserLabel.user0;
+  String selectedUser = "";
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
@@ -45,6 +45,7 @@ class FormPageState extends ConsumerState<FormPage> {
   Report? currentReport;
   String? workId;
   late OpenFormPageMode mode;
+  late List<String> userNames;
 
   void initState() {
     super.initState();
@@ -58,7 +59,7 @@ class FormPageState extends ConsumerState<FormPage> {
       endTime = currentReport!.endTime;
       fee = currentReport!.fee!;
       description = currentReport!.description!;
-      selectedUser = UserLabel.values[currentReport!.user];
+      selectedUser = UserManager().getUserName(currentReport!.user);
     } else if (mode == OpenFormPageMode.workTap) {
       currentReport = widget.currentReport;
       id = currentReport?.id;
@@ -67,7 +68,7 @@ class FormPageState extends ConsumerState<FormPage> {
       endTime = currentReport!.endTime;
       fee = currentReport!.fee!;
       description = currentReport!.description!;
-      selectedUser = UserLabel.values[currentReport!.user];
+      selectedUser = UserManager().getUserName(currentReport!.user);
       workId = widget.workId;
     }
 
@@ -77,6 +78,11 @@ class FormPageState extends ConsumerState<FormPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Future(() {
+    //   final userListModel = context.read<UserListModel>();
+    //   userListModel.getUsers();
+    // });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('仕事の記録'),
@@ -161,25 +167,23 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  Widget UserLabelButton(UserLabel label) {
-    return DropdownMenu<UserLabel>(
-      initialSelection: label,
-      controller: userController,
-      requestFocusOnTap: true,
-      label: const Text('利用者'),
-      onSelected: (UserLabel? user) {
-        setState(() {
-          selectedUser = user!;
-        });
-      },
-      dropdownMenuEntries:
-          UserLabel.values.map<DropdownMenuEntry<UserLabel>>((UserLabel color) {
-        return DropdownMenuEntry<UserLabel>(
-          value: color,
-          label: color.label,
-        );
-      }).toList(),
-    );
+  UserLabelButton(String userName) {
+        return DropdownMenu<String>(
+        initialSelection: userName,
+        controller: userController,
+        requestFocusOnTap: true,
+        label: const Text('利用者'),
+        onSelected: (String? newUserName) {
+          setState(() {
+            selectedUser = newUserName!;
+          });
+        },
+        dropdownMenuEntries: UserManager().getAllUserName().map<DropdownMenuEntry<String>>((String value) {
+          return DropdownMenuEntry<String>(value: value, label: value);
+        }).toList(),
+      );
+
+
   }
 
   Widget RegisterButton() {
@@ -320,17 +324,15 @@ class FormPageState extends ConsumerState<FormPage> {
           endTime!,
           fee,
           description,
-          selectedUser!.index,
-          helperId,
-          breakTime,
-          commuingRoute
-          );
+          UserManager().getUserId(selectedUser),
+          helperId);
     } else if (mode == OpenFormPageMode.add) {
       ref.read(reportListProvider.notifier).addReport(date, startTime!,
-          endTime!, fee, description, selectedUser!.index, helperId, breakTime, commuingRoute);
+          endTime!, fee, description, UserManager().getUserId(selectedUser), helperId);
     } else if (mode == OpenFormPageMode.workTap && workId != null) {
       ref.read(reportListProvider.notifier).addRelatedReport(date, startTime!,
-          endTime!, fee, description, selectedUser!.index, helperId, workId!, breakTime, commuingRoute);
+          endTime!, fee, description, UserManager().getUserId(selectedUser), helperId, workId!);
+
     }
   }
 
