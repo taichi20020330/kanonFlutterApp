@@ -27,7 +27,6 @@ class TableEventsExample extends ConsumerStatefulWidget {
 
 class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   final db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   late final ValueNotifier<List<Work>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
@@ -50,7 +49,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
 
   Future<void> _initializeData() async {
     final auth = FirebaseAuth.instance;
-    final helperId = await auth.currentUser?.uid.toString() ?? '';
+    final helperId =  auth.currentUser?.uid.toString() ?? '';
     currentWorkList =
         await ref.read(workListNotifierProvider.notifier).updateWorkList();
     for (final work in currentWorkList) {

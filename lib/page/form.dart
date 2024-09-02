@@ -76,11 +76,6 @@ class FormPageState extends ConsumerState<FormPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Future(() {
-    //   final userListModel = context.read<UserListModel>();
-    //   userListModel.getUsers();
-    // });
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('仕事の記録'),
@@ -206,7 +201,6 @@ class FormPageState extends ConsumerState<FormPage> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             filled: true,
-            hintText: '340',
             labelText: '交通手当',
           ),
           onChanged: (value) {
@@ -218,60 +212,75 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   RootTextField() {
-    final TextEditingController origin_controller = TextEditingController();
-    final TextEditingController destination_controller =
-        TextEditingController();
+    final TextEditingController root_controller = TextEditingController();
 
-    const List<String> trip_list = <String>['片道', '往復'];
-    String dropdownValue = trip_list.first;
 
-    return Row(
-      children: [
-        SizedBox(
-          width: 80,
-          child: TextField(
-            controller: origin_controller,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: '出発地',
-            ),
-            onChanged: (value) {
-              origin = value;
-            },
-          ),
-        ),
-        const SizedBox(width: 20), // ここで間隔を追加
-        SizedBox(
-            width: 120,
-            child: DropdownMenu<String>(
-              initialSelection: trip_list.first,
-              onSelected: (String? value) {
-                // This is called when the user selects an item.
-                setState(() {
-                  dropdownValue = value!;
-                });
-              },
-              dropdownMenuEntries:
-                  trip_list.map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(value: value, label: value);
-              }).toList(),
-            )),
-        const SizedBox(width: 20), // ここで間隔を追加
-        SizedBox(
-          width: 80,
-          child: TextField(
-            controller: destination_controller,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: '到着地',
-            ),
-            onChanged: (value) {
-              destination = value;
-            },
-          ),
-        )
-      ],
+    // final TextEditingController origin_controller = TextEditingController();
+    // final TextEditingController destination_controller =
+    //     TextEditingController();
+
+    // const List<String> trip_list = <String>['片道', '往復'];
+    // String dropdownValue = trip_list.first;
+    return TextField(
+      controller: root_controller,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        filled: true,
+        labelText: '通勤経路等',
+      ),
+      onChanged: (value) {
+        origin = value;
+      },
     );
+    
+
+    // return Row(
+    //   children: [
+    //     SizedBox(
+    //       width: 80,
+    //       child: TextField(
+    //         controller: origin_controller,
+    //         decoration: const InputDecoration(
+    //           border: OutlineInputBorder(),
+    //           labelText: '出発地',
+    //         ),
+    //         onChanged: (value) {
+    //           origin = value;
+    //         },
+    //       ),
+    //     ),
+    //     const SizedBox(width: 20), // ここで間隔を追加
+    //     SizedBox(
+    //         width: 120,
+    //         child: DropdownMenu<String>(
+    //           initialSelection: trip_list.first,
+    //           onSelected: (String? value) {
+    //             // This is called when the user selects an item.
+    //             setState(() {
+    //               dropdownValue = value!;
+    //             });
+    //           },
+    //           dropdownMenuEntries:
+    //               trip_list.map<DropdownMenuEntry<String>>((String value) {
+    //             return DropdownMenuEntry<String>(value: value, label: value);
+    //           }).toList(),
+    //         )),
+    //     const SizedBox(width: 20), // ここで間隔を追加
+    //     SizedBox(
+    //       width: 80,
+    //       child: TextField(
+    //         controller: destination_controller,
+    //         decoration: const InputDecoration(
+    //           border: OutlineInputBorder(),
+    //           labelText: '到着地',
+    //         ),
+    //         onChanged: (value) {
+    //           destination = value;
+    //         },
+    //       ),
+    //     )
+    //   ],
+    // );
   }
 
   DescriptionTextField() {
@@ -280,7 +289,6 @@ class FormPageState extends ConsumerState<FormPage> {
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         filled: true,
-        hintText: 'Enter a description...',
         labelText: '備考',
       ),
       onChanged: (value) {
@@ -355,7 +363,11 @@ class FormPageState extends ConsumerState<FormPage> {
     );
     if (picked != null && picked != selectTime) {
       setState(() {
-        selectTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
+        if (timeLabel == TimeLabel.startTime) {
+          startTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
+        } else {
+          endTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
+        }
       });
     }
   }

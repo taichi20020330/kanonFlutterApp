@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -19,13 +20,17 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
   late TabController _tabController;
   Map<String, List<Report>> groupedReports = {};
   List<Report> sortedReports = [];
+  late String helperId;
 
   @override
   void initState() {
     super.initState();
     UserManager().initializeUsers().then((_) {
-      setState(() {}); // 必要に応じて状態を更新
+      setState(() {});
     });
+      
+    final auth = FirebaseAuth.instance;
+    helperId = auth.currentUser?.uid.toString() ?? '';
   }
 
   @override
@@ -56,7 +61,10 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
                       .toList() ??
                   [];
 
-                sortedReports = reports
+              final filteredReports = reports
+                  .where((report) => report.helperId == helperId)
+                  .toList();
+              sortedReports = filteredReports
                 ..sort((Report a, Report b) => a.date.compareTo(b.date));
               groupedReports = groupReportsByMonth(sortedReports);
               int tabInitialIndex = getTabInitialIndex(groupedReports);
@@ -101,17 +109,16 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
     return TabBarView(
       controller: _tabController,
       children: groupedReports.entries.map((entry) {
-        List<Report> sortedReports = entry.value
-            .where((report) => !report.deleteFlag)
-            .toList()
-          ..sort((a, b) {
-            int dateComparison = a.date.compareTo(b.date);
-            if (dateComparison != 0) {
-              return dateComparison;
-            } else {
-              return a.startTime.compareTo(b.startTime);
-            }
-          });
+        List<Report> sortedReports =
+            entry.value.where((report) => !report.deleteFlag).toList()
+              ..sort((a, b) {
+                int dateComparison = a.date.compareTo(b.date);
+                if (dateComparison != 0) {
+                  return dateComparison;
+                } else {
+                  return a.startTime.compareTo(b.startTime);
+                }
+              });
         Duration totalWorkTime = calculateTotalWorkTime(sortedReports);
         double monthlySalary = calculateMonthlySalary(totalWorkTime);
 
@@ -136,27 +143,25 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
   }
 
   Widget WorkTimeText(Duration totalWorkTime) {
-  return Text(
-    '合計勤務時間: ${totalWorkTime.inHours} 時間 ${totalWorkTime.inMinutes.remainder(60)} 分',
-    style: const TextStyle(
-      fontSize: 14,
-      color: Colors.grey,
-    ),
-  );
-}
+    return Text(
+      '合計勤務時間: ${totalWorkTime.inHours} 時間 ${totalWorkTime.inMinutes.remainder(60)} 分',
+      style: const TextStyle(
+        fontSize: 14,
+        color: Colors.grey,
+      ),
+    );
+  }
 
-Widget SalaryText(double monthlySalary) {
-  return Text(
-    '給与: ${monthlySalary.toInt()}円',
-    style: const TextStyle(
-      fontSize: 14,
-      color: Colors.grey,
-    ),
-  );
+  Widget SalaryText(double monthlySalary) {
+    return Text(
+      '給与: ${monthlySalary.toInt()}円',
+      style: const TextStyle(
+        fontSize: 14,
+        color: Colors.grey,
+      ),
+    );
+  }
 }
-}
-
-
 
 Map<String, List<Report>> groupReportsByMonth(List<Report> reports) {
   Map<String, List<Report>> groupedReports = {};
@@ -178,7 +183,10 @@ int getTabInitialIndex(Map<String, List<Report>> groupedReports) {
   int tabInitialIndex = 0;
   if (groupedReports.containsKey(formattedNow)) {
     tabInitialIndex = groupedReports.keys.toList().indexOf(formattedNow);
+  } else {
+    tabInitialIndex = groupedReports.keys.length - 1;
   }
+
   return tabInitialIndex;
 }
 
