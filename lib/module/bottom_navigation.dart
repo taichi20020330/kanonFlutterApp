@@ -21,6 +21,10 @@ class BottomNavigationPage extends ConsumerWidget {
         appBarTitle = "Report";
         bodyWidget = ReportListPage();
         break;
+      case PageType.Logout:
+        appBarTitle = "Logout";
+        bodyWidget = LogoutPage();
+        break;
       case PageType.Calendar:
         appBarTitle = "Calendar";
         bodyWidget = TableEventsExample();
@@ -29,10 +33,7 @@ class BottomNavigationPage extends ConsumerWidget {
         appBarTitle = "Settings";
         bodyWidget = Container();
         break;
-      case PageType.Logout:
-        appBarTitle = "Logout";
-        bodyWidget = LogoutPage();
-        break;
+      
     }
 
     return Scaffold(
@@ -45,14 +46,6 @@ class BottomNavigationPage extends ConsumerWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.edit_square),
             label: 'Report',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.logout),

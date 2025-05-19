@@ -64,4 +64,39 @@ class _LogoutPageState extends ConsumerState<LogoutPage> {
       ),
     );
   }
+
+  Widget LogoutButton() {
+    return Center(
+      child: ElevatedButton(
+          onPressed: () async {
+            try {
+              // ログアウト処理
+              await FirebaseAuth.instance.signOut();
+              ref.read(pageProvider.notifier).changePage(PageType.Report);
+              // ログイン画面に遷移＋チャット画面を破棄
+              await Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) {
+                  return LoginPage();
+                }),
+              );
+            } catch (e) {
+              // ログインに失敗した場合
+              setState(() {
+                infoText = "ログアウトに失敗しました：${e.toString()}";
+              });
+            }
+          },
+          child: Text('ログアウト')),
+    );
+  }
+
+  Widget BackButton() {
+    return Center(
+      child: ElevatedButton(
+          onPressed: () {
+            ref.read(pageProvider.notifier).changePage(PageType.Report);
+          },
+          child: Text('戻る')),
+    );
+  }
 }

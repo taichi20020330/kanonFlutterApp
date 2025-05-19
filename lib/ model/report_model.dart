@@ -17,7 +17,7 @@ class ReportModel extends ChangeNotifier {
   }
 
   void addReport(DateTime date, DateTime startTime, DateTime endTime, int? fee,
-      String? description, int user, String helperId, String commutingRoute) async {
+      String? description, int user, String helperId, int breakTime, String commutingRoute) async {
     await FirebaseFirestore.instance
         .collection('reports') // コレクションID指定
         .doc() // ドキュメントID自動生成
@@ -30,13 +30,15 @@ class ReportModel extends ChangeNotifier {
       'helperId': helperId,
       'description': description,
       'date': date,
+      'breakTime': breakTime,
+      'commutingRoute' : commutingRoute,
       'deleteFlag': false,
       'commutingRoute': commutingRoute
     });
   }
 
   void addRelatedReport(DateTime date, DateTime startTime, DateTime endTime,
-      int? fee, String? description, int user, String helperId, String workId,String commutingRoute) async {
+      int? fee, String? description, int user, String helperId, String workId, int breakTime, String commutingRoute ) async {
     final docRef = await FirebaseFirestore.instance
         .collection('reports') // コレクションID指定
         .doc(); // ドキュメントID自動生成
@@ -52,6 +54,8 @@ class ReportModel extends ChangeNotifier {
       'helperId': helperId,
       'description': description,
       'date': date,
+      'breakTime': breakTime,
+      'commutingRoute' : commutingRoute,
       'deleteFlag': false,
       'commutingRoute': commutingRoute
 
@@ -66,7 +70,7 @@ class ReportModel extends ChangeNotifier {
   });
   }
   void updateReport(String id, DateTime date, DateTime startTime,
-      DateTime endTime, int? fee, String? description, int user, String helperId, String commutingRoute) async {
+      DateTime endTime, int? fee, String? description, int user, String helperId,  int breakTime, String commutingRoute) async {
     await FirebaseFirestore.instance.collection('reports').doc(id).update({
       'startTime': startTime,
       'endTime': endTime,
@@ -76,7 +80,8 @@ class ReportModel extends ChangeNotifier {
       'helperId' : helperId,
       'description': description,
       'date': date,
-      'commutingRoute': commutingRoute
+      'breakTime': breakTime,
+      'commutingRoute' : commutingRoute,
     });
   }
 

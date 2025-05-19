@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart';
 import 'package:kanon_app/%20model/work_notifier.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/data/report.dart';
@@ -118,8 +119,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
             itemCount: value.length,
             itemBuilder: (context, index) {
               final work = value[index];
-              bool isReported= work.isReported;
-              print(work.id);
+              bool isReported = work.isReported;
               return Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: 12.0,
@@ -139,15 +139,9 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
                     '${convertToTimeFormat(work.scheduledStartTime)} - ${convertToTimeFormat(work.scheduledEndTime)}',
                   ),
                   trailing: (isReported)
-                      ? const Icon(
-                          Icons.content_copy,
-                          // 薄い赤色
-                        )
-                      : const Icon(
-                          Icons.error,
-                          // 薄い赤色
-                          color: Colors.redAccent,
-                        ),
+                      ? const Text("済")
+                      : const Text("未提出",
+                          style: TextStyle(color: Colors.redAccent)),
                   onTap: () {
                     // タップした時の処理
                     submitReportsFromCalendar(context, work);
@@ -162,9 +156,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
   }
 
   Widget CalendarWidget() {
-    Color makerColor = Colors.redAccent;
     return TableCalendar<Work>(
-      
       locale: 'ja_JP',
       firstDay: DateTime(kToday.year, kToday.month - 2, kToday.day),
       lastDay: kLastDay,
@@ -177,28 +169,23 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       eventLoader: _getEventsForDay,
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarBuilders: CalendarBuilders<Work>(
-      markerBuilder: (context, date, events) {
-        // eventsのreportIdが
-        for(final event in events){
-          if(event.isReported){
-            return  Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF263238),
-                  shape: BoxShape.circle
-                ));
+        markerBuilder: (context, date, events) {
+          List<Widget> markers = [];
+          for (final event in events) {
+            markers.add(getColorMaker(event.isReported));
           }
-        }
-      },
-    ),
-    calendarStyle:  CalendarStyle(
-        outsideDaysVisible: false,
-        markerDecoration: BoxDecoration(
-          color: makerColor,
-          shape: BoxShape.circle,)
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: markers,
+          );
+        },
       ),
-      
+      calendarStyle: const CalendarStyle(
+          outsideDaysVisible: false,
+          markerDecoration: BoxDecoration(
+            color: Colors.redAccent,
+            shape: BoxShape.circle,
+          )),
       onDaySelected: _onDaySelected,
       onRangeSelected: _onRangeSelected,
       onFormatChanged: (format) {
@@ -213,6 +200,19 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
       },
     );
   }
+
+  Widget getColorMaker(bool isReported) {
+    return Container(
+      width: 7,
+      height: 7,
+      decoration: BoxDecoration(
+        color: isReported ? const Color(0xFF263238) : Colors.redAccent,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
+  //////////////////////////////
 
   List<Work> _getEventsForDay(DateTime day) {
     if (kEvents[day] != null) {}
@@ -234,7 +234,7 @@ class _TableEventsExampleState extends ConsumerState<TableEventsExample> {
         _focusedDay = focusedDay;
         _rangeStart = null; // Important to clean those
         _rangeEnd = null;
-        
+
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
 

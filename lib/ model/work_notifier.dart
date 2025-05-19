@@ -14,7 +14,6 @@ part 'work_notifier.g.dart';
 class WorkListNotifier extends _$WorkListNotifier {
   List<Work> works = [];
 
-
   @override
   Future<List<Work>> build() async {
     return fetchWorkListfromFirestore();
@@ -27,23 +26,24 @@ class WorkListNotifier extends _$WorkListNotifier {
 
     // データをWorkオブジェクトのリストに変換
     works = snapshot.docs.map((doc) {
-      Map<String, dynamic> data = doc.data();
+     return Work.fromFirestore(doc);
+      // Map<String, dynamic> data = doc.data();
 
-      DateTime date = (data['date'] as Timestamp).toDate();
-      int start =
-          extractTimeFromTimestamp(data['scheduledStartTime'] as Timestamp);
-      int end = extractTimeFromTimestamp(data['scheduledEndTime'] as Timestamp);
+      // DateTime date = (data['date'] as Timestamp).toDate();
+      // int start =
+      //     extractTimeFromTimestamp(data['scheduledStartTime'] as Timestamp);
+      // int end = extractTimeFromTimestamp(data['scheduledEndTime'] as Timestamp);
 
-      // Create a Work object with the parsed DateTime.
-      return Work.fromJson({
-        'id': doc.id,
-        'date': date.toString(),
-        'scheduledStartTime': start,
-        'scheduledEndTime': end,
-        'userId': data['userId'],
-        'helperId': data['helperId'],
-        'isReported': data['isReported']
-      });
+      // // Create a Work object with the parsed DateTime.
+      // return Work.fromJson({
+      //   'id': doc.id,
+      //   'date': date.toString(),
+      //   'scheduledStartTime': start,
+      //   'scheduledEndTime': end,
+      //   'userId': data['userId'],
+      //   'helperId': data['helperId'],
+      //   'isReported': data['isReported']
+      // });
     }).toList();
     state = AsyncValue.data(works);
 
@@ -63,13 +63,5 @@ class WorkListNotifier extends _$WorkListNotifier {
       'isReported': true
     });
   }
-
-
-  // void linkReportidWithWork(String reportId, String workId) async {
-  //   await FirebaseFirestore.instance.collection('works').doc(workId).update({
-  //     'reportId':  reportId
-  //   });
-  // }
-
 
 }

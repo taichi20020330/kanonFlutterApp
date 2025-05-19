@@ -6,11 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanon_app/repository/user_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:kanon_app/data/enum.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
-import 'package:kanon_app/%20model/report_model.dart';
 
 class FormPage extends ConsumerStatefulWidget {
   FormPage({required this.mode, this.currentReport, this.workId, super.key});
@@ -27,24 +27,27 @@ class FormPageState extends ConsumerState<FormPage> {
   final TextEditingController _routeController = TextEditingController();
 
 
-  UserLabel selectedUser = UserLabel.user0;
+  String selectedUser = "";
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
+  String commuingRoute = '';
   String? id;
   int fee = 0;
-  String origin = '';
+  int breakTime = 0;
+  String departure = '';
   String destination = '';
   String commutingRoute = '';
   DateTime date = DateTime.now();
   double maxValue = 0;
   bool? brushedTeeth = false;
   bool enableFeature = false;
-  DateTime? startTime = DateTime.now();
-  DateTime? endTime = DateTime.now();
+  DateTime startTime = DateTime.now();
+  DateTime endTime = DateTime.now();
   Report? currentReport;
   String? workId;
   late OpenFormPageMode mode;
+  late List<String> userNames;
 
   void initState() {
     super.initState();
@@ -63,8 +66,8 @@ class FormPageState extends ConsumerState<FormPage> {
       endTime = currentReport!.endTime;
       fee = currentReport!.fee!;
       description = currentReport!.description!;
-      selectedUser = UserLabel.values[currentReport!.user];
       _routeController.text = currentReport!.commutingRoute!;
+      selectedUser = UserManager().getUserName(currentReport!.user);
     } else if (mode == OpenFormPageMode.workTap) {
       currentReport = widget.currentReport;
       id = currentReport?.id;
@@ -73,7 +76,7 @@ class FormPageState extends ConsumerState<FormPage> {
       endTime = currentReport!.endTime;
       fee = currentReport!.fee!;
       description = currentReport!.description!;
-      selectedUser = UserLabel.values[currentReport!.user];
+      selectedUser = UserManager().getUserName(currentReport!.user);
       workId = widget.workId;
       _routeController.text = currentReport!.commutingRoute!;
 
@@ -85,6 +88,11 @@ class FormPageState extends ConsumerState<FormPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Future(() {
+    //   final userListModel = context.read<UserListModel>();
+    //   userListModel.getUsers();
+    // });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('仕事の記録'),
@@ -118,6 +126,7 @@ class FormPageState extends ConsumerState<FormPage> {
                               context, TimeSelectButtonMode.startTimeMode),
                           TimeSelectButton(
                               context, TimeSelectButtonMode.endTimeMode),
+                          BreakTimeTextField(),
                           UserLabelButton(selectedUser),
                           FeeTextField(),
                           RootTextField(),
@@ -143,7 +152,7 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  TimeSelectButton(BuildContext context, TimeSelectButtonMode mode) {
+  Widget TimeSelectButton(BuildContext context, TimeSelectButtonMode mode) {
     DateTime? selectTime;
     TimeLabel timeLabel;
     if (mode == TimeSelectButtonMode.startTimeMode) {
@@ -168,28 +177,26 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  UserLabelButton(UserLabel label) {
-    return DropdownMenu<UserLabel>(
-      initialSelection: label,
-      controller: userController,
-      requestFocusOnTap: true,
-      label: const Text('利用者'),
-      onSelected: (UserLabel? user) {
-        setState(() {
-          selectedUser = user!;
-        });
-      },
-      dropdownMenuEntries:
-          UserLabel.values.map<DropdownMenuEntry<UserLabel>>((UserLabel color) {
-        return DropdownMenuEntry<UserLabel>(
-          value: color,
-          label: color.label,
-        );
-      }).toList(),
-    );
+  UserLabelButton(String userName) {
+        return DropdownMenu<String>(
+        initialSelection: userName,
+        controller: userController,
+        requestFocusOnTap: true,
+        label: const Text('利用者'),
+        onSelected: (String? newUserName) {
+          setState(() {
+            selectedUser = newUserName!;
+          });
+        },
+        dropdownMenuEntries: UserManager().getAllUserName().map<DropdownMenuEntry<String>>((String value) {
+          return DropdownMenuEntry<String>(value: value, label: value);
+        }).toList(),
+      );
+
+
   }
 
-  RegisterButton() {
+  Widget RegisterButton() {
     return ElevatedButton(
         onPressed: () => _comfirmForm(context),
         child: Text('登録', style: TextStyle(color: Colors.white)),
@@ -199,33 +206,37 @@ class FormPageState extends ConsumerState<FormPage> {
         ));
   }
 
-  FeeTextField() {
+  Widget FeeTextField() {
     final TextEditingController controller = TextEditingController(
       text: fee.toString(),
     );
 
-    return Column(
+    return Row(
       children: [
-        TextField(
-          controller: controller,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            filled: true,
-            hintText: '340',
-            labelText: '交通手当',
-          ),
-          onChanged: (value) {
-            fee = int.parse(value);
-          },
-        ),
+        SizedBox(
+              width: 80,
+              child: TextField(
+                controller: controller,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  labelText: '交通手当',
+                ),
+                onChanged: (value) {
+                  fee = int.parse(value);
+                },
+              ),
+            ),
+            const Padding(
+              padding:  EdgeInsets.only(left: 10),
+              child:  Text('円' , style: TextStyle(fontSize: 12)),
+            ),
       ],
     );
-  }
 
   RootTextField() {
-
     return Row(
       children: [
         Expanded(
@@ -254,25 +265,25 @@ class FormPageState extends ConsumerState<FormPage> {
             ),
           ],
         ),
+
       ],
     );
   }
 
-  
 
-  DescriptionTextField() {
+
+  Widget DescriptionTextField() {
     return TextFormField(
       initialValue: description,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         filled: true,
-        hintText: 'Enter a description...',
         labelText: '備考',
       ),
       onChanged: (value) {
         description = value;
       },
-      maxLines: 5,
+      maxLines: 3,
     );
   }
 
@@ -282,6 +293,8 @@ class FormPageState extends ConsumerState<FormPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
       );
+      print(startTime);
+      print(endTime);
     } else {
       if (_formKey.currentState!.validate()) {
         addReportToFirebase();
@@ -306,20 +319,21 @@ class FormPageState extends ConsumerState<FormPage> {
           endTime!,
           fee,
           description,
-          selectedUser!.index,
-          helperId,
-          commutingRoute);
+
+          UserManager().getUserId(selectedUser),
+          helperId);
     } else if (mode == OpenFormPageMode.add) {
       ref.read(reportListProvider.notifier).addReport(date, startTime!,
-          endTime!, fee, description, selectedUser!.index, helperId, commutingRoute);
+          endTime!, fee, description, UserManager().getUserId(selectedUser), helperId);
     } else if (mode == OpenFormPageMode.workTap && workId != null) {
       ref.read(reportListProvider.notifier).addRelatedReport(date, startTime!,
-          endTime!, fee, description, selectedUser!.index, helperId, workId!, commutingRoute);
+          endTime!, fee, description, UserManager().getUserId(selectedUser), helperId, workId!);
+
     }
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {
-    DateTime? selectTime;
+    DateTime selectTime;
 
     if (timeLabel == TimeLabel.startTime) {
       selectTime = startTime;
@@ -330,7 +344,7 @@ class FormPageState extends ConsumerState<FormPage> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: (selectTime != null)
-          ? TimeOfDay.fromDateTime(selectTime!)
+          ? TimeOfDay.fromDateTime(selectTime)
           : TimeOfDay.now(),
       // initialTime: TimeOfDay.fromDateTime(startTime),
       builder: (BuildContext context, Widget? child) {
@@ -356,6 +370,7 @@ class FormPageState extends ConsumerState<FormPage> {
       }
     });
   }
+
   }
 }
 
@@ -412,3 +427,61 @@ class _FormDatePickerState extends State<_FormDatePicker> {
     );
   }
 }
+
+
+  // RootTextField() {
+  //   final TextEditingController departure_controller = TextEditingController();
+  //   final TextEditingController destination_controller =
+  //       TextEditingController();
+
+  //   const List<String> trip_list = <String>['片道', '往復'];
+  //   String dropdownValue = trip_list.first;
+
+  //   return Row(
+  //     children: [
+  //       SizedBox(
+  //         width: 80,
+  //         child: TextField(
+  //           controller: departure_controller,
+  //           decoration: const InputDecoration(
+  //             border: OutlineInputBorder(),
+  //             labelText: '出発地',
+  //           ),
+  //           onChanged: (value) {
+  //             departure = value;
+  //           },
+  //         ),
+  //       ),
+  //       const SizedBox(width: 20), // ここで間隔を追加
+  //       SizedBox(
+  //           width: 120,
+  //           child: DropdownMenu<String>(
+  //             initialSelection: trip_list.first,
+  //             onSelected: (String? value) {
+  //               // This is called when the user selects an item.
+  //               setState(() {
+  //                 dropdownValue = value!;
+  //               });
+  //             },
+  //             dropdownMenuEntries:
+  //                 trip_list.map<DropdownMenuEntry<String>>((String value) {
+  //               return DropdownMenuEntry<String>(value: value, label: value);
+  //             }).toList(),
+  //           )),
+  //       const SizedBox(width: 20), // ここで間隔を追加
+  //       SizedBox(
+  //         width: 80,
+  //         child: TextField(
+  //           controller: destination_controller,
+  //           decoration: const InputDecoration(
+  //             border: OutlineInputBorder(),
+  //             labelText: '到着地',
+  //           ),
+  //           onChanged: (value) {
+  //             destination = value;
+  //           },
+  //         ),
+  //       )
+  //     ],
+  //   );
+  // }
