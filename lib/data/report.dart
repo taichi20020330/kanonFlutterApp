@@ -11,6 +11,7 @@ class Report {
   final DateTime date;
   final int user;
   final String helperId;
+  final String? commutingRoute;
   final bool deleteFlag;
 
   const Report({
@@ -23,6 +24,7 @@ class Report {
     required this.helperId,
     this.description,
     required this.date,
-    required this.deleteFlag
+    required this.deleteFlag,
+    this.commutingRoute,
   });
 }

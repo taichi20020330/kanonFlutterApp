@@ -31,7 +31,7 @@ class _LogoutPageState extends ConsumerState<LogoutPage> {
             children: <Widget>[
               const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                  child: Text('本当にログアウトしますか？')),
+                  child: Text('ログアウトしますか？')),
               Center(
                 child: ElevatedButton(
                     onPressed: () async {
@@ -56,15 +56,8 @@ class _LogoutPageState extends ConsumerState<LogoutPage> {
                     },
                     child: Text('ログアウト')),
               ),
-              Center(
-                child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(pageProvider.notifier)
-                          .changePage(PageType.Report);
-                    },
-                    child: Text('戻る')),
-              ),
+              
+
             ],
           ),
         ),

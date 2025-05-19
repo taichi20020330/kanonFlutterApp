@@ -7,6 +7,7 @@ import 'package:kanon_app/data/utils.dart';
 import 'package:kanon_app/page/form.dart';
 import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
+import 'package:kanon_app/page/logout.dart';
 
 class ReportListPage extends ConsumerStatefulWidget {
   @override
@@ -48,7 +49,9 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
                           helperId: doc['helperId'],
                           description: doc['description'],
                           date: doc['date'].toDate(),
-                          deleteFlag: doc['deleteFlag']))
+                          deleteFlag: doc['deleteFlag'],
+                          commutingRoute: doc['commutingRoute']
+                          ))
                       .toList() ??
                   [];
 
@@ -67,6 +70,14 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
                 child: Scaffold(
                   appBar: AppBar(
                     title: const Text('出勤簿リスト'),
+                    actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Navigator.of(context).push(_createRoute());
+            },
+          ),
+        ],
                     bottom: TabBar(
                       controller: _tabController,
                       isScrollable: true,
@@ -93,6 +104,24 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
         });
   }
 
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => const LogoutPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0); // 右から
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
+  }
+
+
+
   Widget ReportListBottomTabBar() {
     return TabBarView(
       controller: _tabController,
@@ -117,7 +146,7 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
             WorkTimeText(totalWorkTime),
             SalaryText(monthlySalary),
             for (var report in sortedReports) ...[
-              if (sortedReports.indexOf(report) > 0)
+              if (sortedReports.contains(report))
                 ProviderScope(
                   overrides: [
                     _currentReport.overrideWithValue(report),

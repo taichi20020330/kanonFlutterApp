@@ -17,7 +17,7 @@ class ReportModel extends ChangeNotifier {
   }
 
   void addReport(DateTime date, DateTime startTime, DateTime endTime, int? fee,
-      String? description, int user, String helperId) async {
+      String? description, int user, String helperId, String commutingRoute) async {
     await FirebaseFirestore.instance
         .collection('reports') // コレクションID指定
         .doc() // ドキュメントID自動生成
@@ -31,11 +31,12 @@ class ReportModel extends ChangeNotifier {
       'description': description,
       'date': date,
       'deleteFlag': false,
+      'commutingRoute': commutingRoute
     });
   }
 
   void addRelatedReport(DateTime date, DateTime startTime, DateTime endTime,
-      int? fee, String? description, int user, String helperId, String workId) async {
+      int? fee, String? description, int user, String helperId, String workId,String commutingRoute) async {
     final docRef = await FirebaseFirestore.instance
         .collection('reports') // コレクションID指定
         .doc(); // ドキュメントID自動生成
@@ -52,6 +53,8 @@ class ReportModel extends ChangeNotifier {
       'description': description,
       'date': date,
       'deleteFlag': false,
+      'commutingRoute': commutingRoute
+
     });
 
     // linkReportidWithWork(docId, workId);
@@ -63,7 +66,7 @@ class ReportModel extends ChangeNotifier {
   });
   }
   void updateReport(String id, DateTime date, DateTime startTime,
-      DateTime endTime, int? fee, String? description, int user, String helperId) async {
+      DateTime endTime, int? fee, String? description, int user, String helperId, String commutingRoute) async {
     await FirebaseFirestore.instance.collection('reports').doc(id).update({
       'startTime': startTime,
       'endTime': endTime,
@@ -73,6 +76,7 @@ class ReportModel extends ChangeNotifier {
       'helperId' : helperId,
       'description': description,
       'date': date,
+      'commutingRoute': commutingRoute
     });
   }
 

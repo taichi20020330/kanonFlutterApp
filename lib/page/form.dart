@@ -24,6 +24,8 @@ class FormPage extends ConsumerStatefulWidget {
 
 class FormPageState extends ConsumerState<FormPage> {
   final TextEditingController userController = TextEditingController();
+  final TextEditingController _routeController = TextEditingController();
+
 
   UserLabel selectedUser = UserLabel.user0;
   final _formKey = GlobalKey<FormState>();
@@ -33,7 +35,7 @@ class FormPageState extends ConsumerState<FormPage> {
   int fee = 0;
   String origin = '';
   String destination = '';
-  bool isRoundTrip = false;
+  String commutingRoute = '';
   DateTime date = DateTime.now();
   double maxValue = 0;
   bool? brushedTeeth = false;
@@ -47,6 +49,11 @@ class FormPageState extends ConsumerState<FormPage> {
   void initState() {
     super.initState();
     mode = widget.mode;
+    _routeController.addListener(() {
+    setState(() {
+      commutingRoute = _routeController.text;
+    });
+  });
 
     if (mode == OpenFormPageMode.edit) {
       currentReport = widget.currentReport;
@@ -57,6 +64,7 @@ class FormPageState extends ConsumerState<FormPage> {
       fee = currentReport!.fee!;
       description = currentReport!.description!;
       selectedUser = UserLabel.values[currentReport!.user];
+      _routeController.text = currentReport!.commutingRoute!;
     } else if (mode == OpenFormPageMode.workTap) {
       currentReport = widget.currentReport;
       id = currentReport?.id;
@@ -67,6 +75,8 @@ class FormPageState extends ConsumerState<FormPage> {
       description = currentReport!.description!;
       selectedUser = UserLabel.values[currentReport!.user];
       workId = widget.workId;
+      _routeController.text = currentReport!.commutingRoute!;
+
     }
 
     // "ref" can be used in all life-cycles of a StatefulWidget.
@@ -215,61 +225,40 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   RootTextField() {
-    final TextEditingController origin_controller = TextEditingController();
-    final TextEditingController destination_controller =
-        TextEditingController();
-
-    const List<String> trip_list = <String>['片道', '往復'];
-    String dropdownValue = trip_list.first;
 
     return Row(
       children: [
-        SizedBox(
-          width: 80,
+        Expanded(
           child: TextField(
-            controller: origin_controller,
+            controller: _routeController,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              labelText: '出発地',
+              labelText: '通勤経路',
             ),
-            onChanged: (value) {
-              origin = value;
-            },
           ),
         ),
-        const SizedBox(width: 20), // ここで間隔を追加
-        SizedBox(
-            width: 120,
-            child: DropdownMenu<String>(
-              initialSelection: trip_list.first,
-              onSelected: (String? value) {
-                // This is called when the user selects an item.
-                setState(() {
-                  dropdownValue = value!;
-                });
+        Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                _routeController.text += "→";
               },
-              dropdownMenuEntries:
-                  trip_list.map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(value: value, label: value);
-              }).toList(),
-            )),
-        const SizedBox(width: 20), // ここで間隔を追加
-        SizedBox(
-          width: 80,
-          child: TextField(
-            controller: destination_controller,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: '到着地',
+              icon: const Icon(Icons.arrow_forward),
             ),
-            onChanged: (value) {
-              destination = value;
-            },
-          ),
-        )
+            const SizedBox(height: 5),
+            IconButton(
+              onPressed: () {
+                _routeController.text += "↔︎";              
+                },
+              icon: const Icon(Icons.compare_arrows)
+            ),
+          ],
+        ),
       ],
     );
   }
+
+  
 
   DescriptionTextField() {
     return TextFormField(
@@ -318,13 +307,14 @@ class FormPageState extends ConsumerState<FormPage> {
           fee,
           description,
           selectedUser!.index,
-          helperId);
+          helperId,
+          commutingRoute);
     } else if (mode == OpenFormPageMode.add) {
       ref.read(reportListProvider.notifier).addReport(date, startTime!,
-          endTime!, fee, description, selectedUser!.index, helperId);
+          endTime!, fee, description, selectedUser!.index, helperId, commutingRoute);
     } else if (mode == OpenFormPageMode.workTap && workId != null) {
       ref.read(reportListProvider.notifier).addRelatedReport(date, startTime!,
-          endTime!, fee, description, selectedUser!.index, helperId, workId!);
+          endTime!, fee, description, selectedUser!.index, helperId, workId!, commutingRoute);
     }
   }
 
@@ -350,11 +340,22 @@ class FormPageState extends ConsumerState<FormPage> {
         );
       },
     );
-    if (picked != null && picked != selectTime) {
-      setState(() {
-        selectTime = DateTime(2024, 1, 1, picked.hour, picked.minute);
-      });
-    }
+    if (picked != null) {
+    setState(() {
+      final newTime = DateTime(
+        startTime!.year,
+        startTime!.month,
+        startTime!.day,
+        picked.hour,
+        picked.minute,
+      );
+      if (timeLabel == TimeLabel.startTime) {
+        startTime = newTime;
+      } else {
+        endTime = newTime;
+      }
+    });
+  }
   }
 }
 
