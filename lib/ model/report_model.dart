@@ -33,6 +33,7 @@ class ReportModel extends ChangeNotifier {
       'breakTime': breakTime,
       'commutingRoute' : commutingRoute,
       'deleteFlag': false,
+      'commutingRoute': commutingRoute
     });
   }
 
@@ -56,6 +57,8 @@ class ReportModel extends ChangeNotifier {
       'breakTime': breakTime,
       'commutingRoute' : commutingRoute,
       'deleteFlag': false,
+      'commutingRoute': commutingRoute
+
     });
 
     // linkReportidWithWork(docId, workId);

@@ -24,6 +24,8 @@ class FormPage extends ConsumerStatefulWidget {
 
 class FormPageState extends ConsumerState<FormPage> {
   final TextEditingController userController = TextEditingController();
+  final TextEditingController _routeController = TextEditingController();
+
 
   String selectedUser = "";
   final _formKey = GlobalKey<FormState>();
@@ -35,7 +37,7 @@ class FormPageState extends ConsumerState<FormPage> {
   int breakTime = 0;
   String departure = '';
   String destination = '';
-  bool isRoundTrip = false;
+  String commutingRoute = '';
   DateTime date = DateTime.now();
   double maxValue = 0;
   bool? brushedTeeth = false;
@@ -50,6 +52,11 @@ class FormPageState extends ConsumerState<FormPage> {
   void initState() {
     super.initState();
     mode = widget.mode;
+    _routeController.addListener(() {
+    setState(() {
+      commutingRoute = _routeController.text;
+    });
+  });
 
     if (mode == OpenFormPageMode.edit) {
       currentReport = widget.currentReport;
@@ -59,6 +66,7 @@ class FormPageState extends ConsumerState<FormPage> {
       endTime = currentReport!.endTime;
       fee = currentReport!.fee!;
       description = currentReport!.description!;
+      _routeController.text = currentReport!.commutingRoute!;
       selectedUser = UserManager().getUserName(currentReport!.user);
     } else if (mode == OpenFormPageMode.workTap) {
       currentReport = widget.currentReport;
@@ -70,6 +78,8 @@ class FormPageState extends ConsumerState<FormPage> {
       description = currentReport!.description!;
       selectedUser = UserManager().getUserName(currentReport!.user);
       workId = widget.workId;
+      _routeController.text = currentReport!.commutingRoute!;
+
     }
 
     // "ref" can be used in all life-cycles of a StatefulWidget.
@@ -226,55 +236,40 @@ class FormPageState extends ConsumerState<FormPage> {
       ],
     );
 
-  }
-
-  Widget BreakTimeTextField() {
-    final TextEditingController controller = TextEditingController(
-      text: breakTime.toString(),
-    );
-
+  RootTextField() {
     return Row(
       children: [
-        SizedBox(
-          width: 80,
+        Expanded(
           child: TextField(
-                controller: controller,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  labelText: '休憩時間',
-                ),
-                onChanged: (value) {
-                  breakTime = int.parse(value);
-                },
-              ),
-        ),
-            const Padding(
-              padding:  EdgeInsets.only(left: 10),
-              child:  Text('分' , style: TextStyle(fontSize: 12)),
+            controller: _routeController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: '通勤経路',
             ),
+          ),
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                _routeController.text += "→";
+              },
+              icon: const Icon(Icons.arrow_forward),
+            ),
+            const SizedBox(height: 5),
+            IconButton(
+              onPressed: () {
+                _routeController.text += "↔︎";              
+                },
+              icon: const Icon(Icons.compare_arrows)
+            ),
+          ],
+        ),
+
       ],
     );
-
-    
   }
 
-  Widget RootTextField() {
-    return TextFormField(
-      initialValue: commuingRoute,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
-        hintText: '石橋から池田、往復',
-        labelText: '通勤経路等',
-      ),
-      onChanged: (value) {
-        commuingRoute = value;
-      },
-    );
-  }
 
 
   Widget DescriptionTextField() {
@@ -324,6 +319,7 @@ class FormPageState extends ConsumerState<FormPage> {
           endTime!,
           fee,
           description,
+
           UserManager().getUserId(selectedUser),
           helperId);
     } else if (mode == OpenFormPageMode.add) {
@@ -358,16 +354,23 @@ class FormPageState extends ConsumerState<FormPage> {
         );
       },
     );
-    if (picked != null && picked != selectTime) {
-      setState(() {
-        if (timeLabel == TimeLabel.startTime) {
-          
-          startTime = DateTime(date.year, date.month, date.day, picked.hour, picked.minute);
-        } else {
-          endTime = DateTime(date.year, date.month, date.day, picked.hour, picked.minute);
-        }
-      });
-    }
+    if (picked != null) {
+    setState(() {
+      final newTime = DateTime(
+        startTime!.year,
+        startTime!.month,
+        startTime!.day,
+        picked.hour,
+        picked.minute,
+      );
+      if (timeLabel == TimeLabel.startTime) {
+        startTime = newTime;
+      } else {
+        endTime = newTime;
+      }
+    });
+  }
+
   }
 }
 

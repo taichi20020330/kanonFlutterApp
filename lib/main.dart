@@ -13,6 +13,7 @@ import 'package:kanon_app/page/login.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kanon_app/page/form.dart';
+import 'package:kanon_app/page/report_list_page.dart';
 import 'firebase_options.dart';
 
 final reportListProvider = ChangeNotifierProvider((ref) => ReportModel());
@@ -72,7 +73,7 @@ class MyApp extends StatelessWidget {
                 brightness: Brightness.light,
               ),
             ),
-            home: BottomNavigationPage(),
+            home: ReportListPage(),
           );
         } else {
           // ログインしていない場合の表示するウィジェット
