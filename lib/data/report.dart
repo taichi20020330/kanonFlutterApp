@@ -12,6 +12,7 @@ class Report {
   final int user;
   final String helperId;
   final String? commutingRoute;
+  final int? breakTime;
   final bool deleteFlag;
 
   const Report({
@@ -23,6 +24,7 @@ class Report {
     required this.user,
     required this.helperId,
     this.description,
+    this.breakTime,
     required this.date,
     required this.deleteFlag,
     this.commutingRoute,

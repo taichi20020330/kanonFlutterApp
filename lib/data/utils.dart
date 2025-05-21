@@ -80,7 +80,14 @@ Duration calculateTotalWorkTime(List<Report> reports) {
         DateTime(2023, 1, 1, report.startTime.hour, report.startTime.minute);
     DateTime endTime = DateTime(
         2023, 1, 1, report.roundUpEndTime.hour, report.roundUpEndTime.minute);
-    return previous + endTime.difference(startTime);
+    Duration workDuration = endTime.difference(startTime);
+
+    int breakMinutes = report.breakTime ?? 0;
+    Duration actualWork = workDuration - Duration(minutes: breakMinutes);
+
+    if (actualWork.isNegative) actualWork = Duration.zero;
+
+    return previous + actualWork;
   });
 }
 
