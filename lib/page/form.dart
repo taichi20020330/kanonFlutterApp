@@ -23,10 +23,6 @@ class FormPage extends ConsumerStatefulWidget {
 }
 
 class FormPageState extends ConsumerState<FormPage> {
-  final TextEditingController userController = TextEditingController();
-  final TextEditingController _routeController = TextEditingController();
-
-
   String selectedUser = "";
   final _formKey = GlobalKey<FormState>();
   String title = '';
@@ -47,16 +43,19 @@ class FormPageState extends ConsumerState<FormPage> {
   Report? currentReport;
   String? workId;
   late OpenFormPageMode mode;
+
   late List<String> userNames;
+  final TextEditingController userController = TextEditingController();
+  final TextEditingController _routeController = TextEditingController();
 
   void initState() {
     super.initState();
     mode = widget.mode;
     _routeController.addListener(() {
-    setState(() {
-      commutingRoute = _routeController.text;
+      setState(() {
+        commutingRoute = _routeController.text;
+      });
     });
-  });
 
     if (mode == OpenFormPageMode.edit) {
       currentReport = widget.currentReport;
@@ -79,7 +78,6 @@ class FormPageState extends ConsumerState<FormPage> {
       selectedUser = UserManager().getUserName(currentReport!.user);
       workId = widget.workId;
       _routeController.text = currentReport!.commutingRoute!;
-
     }
 
     // "ref" can be used in all life-cycles of a StatefulWidget.
@@ -99,48 +97,48 @@ class FormPageState extends ConsumerState<FormPage> {
       ),
       body: GestureDetector(
         onTap: () => primaryFocus?.unfocus(),
-        child: Form(
-          key: _formKey,
-          child: Scrollbar(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Card(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...[
-                          _FormDatePicker(
-                            date: date,
-                            onChanged: (value) {
-                              setState(() {
-                                date = value;
-                              });
-                            },
-                          ),
-                          TimeSelectButton(
-                              context, TimeSelectButtonMode.startTimeMode),
-                          TimeSelectButton(
-                              context, TimeSelectButtonMode.endTimeMode),
-                          BreakTimeTextField(),
-                          UserLabelButton(selectedUser),
-                          FeeTextField(),
-                          RootTextField(),
-                          DescriptionTextField(),
-                          RegisterButton(),
-                        ].expand(
-                          (widget) => [
-                            widget,
-                            const SizedBox(
-                              height: 24,
+        child: Container(
+          color: Colors.grey[100],
+          child: Form(
+            key: _formKey,
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ...[
+                              _FormDatePicker(
+                                date: date,
+                                onChanged: (value) {
+                                  setState(() {
+                                    date = value;
+                                  });
+                                },
+                              ),
+                              TimeSelectField(),
+                              UserLabelButton(selectedUser),
+                              CommutingTextField(),
+                              DescriptionTextField(),
+                              RegisterButton(),
+                            ].expand(
+                              (widget) => [
+                                widget,
+                                const SizedBox(
+                                  height: 24,
+                                )
+                              ],
                             )
                           ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -165,11 +163,18 @@ class FormPageState extends ConsumerState<FormPage> {
 
     return Row(
       children: [
-        TextButton(
-            onPressed: () => _selectTime(context, timeLabel),
-            child: Text(
-              (mode == TimeSelectButtonMode.startTimeMode) ? '開始時間' : '終了時間',
-            )),
+        ElevatedButton(
+          onPressed: () => _selectTime(context, timeLabel),
+          child: Text(
+            (mode == TimeSelectButtonMode.startTimeMode) ? '開始時間' : '終了時間',
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 254, 237, 237),
+            foregroundColor: Colors.black, // 文字色
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        ),
+        SizedBox(width: 8,),
         Text((selectTime != null)
             ? "${selectTime.hour}時${selectTime.minute}分"
             : ""),
@@ -178,22 +183,22 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   UserLabelButton(String userName) {
-        return DropdownMenu<String>(
-        initialSelection: userName,
-        controller: userController,
-        requestFocusOnTap: true,
-        label: const Text('利用者'),
-        onSelected: (String? newUserName) {
-          setState(() {
-            selectedUser = newUserName!;
-          });
-        },
-        dropdownMenuEntries: UserManager().getAllUserName().map<DropdownMenuEntry<String>>((String value) {
-          return DropdownMenuEntry<String>(value: value, label: value);
-        }).toList(),
-      );
-
-
+    return DropdownMenu<String>(
+      initialSelection: userName,
+      controller: userController,
+      requestFocusOnTap: true,
+      label: const Text('利用者'),
+      onSelected: (String? newUserName) {
+        setState(() {
+          selectedUser = newUserName!;
+        });
+      },
+      dropdownMenuEntries: UserManager()
+          .getAllUserName()
+          .map<DropdownMenuEntry<String>>((String value) {
+        return DropdownMenuEntry<String>(value: value, label: value);
+      }).toList(),
+    );
   }
 
   Widget RegisterButton() {
@@ -206,6 +211,16 @@ class FormPageState extends ConsumerState<FormPage> {
         ));
   }
 
+  Widget CommutingTextField() {
+    return Row(
+      children: [
+        RootTextField(),
+        const SizedBox(width: 12),
+        FeeTextField(),
+      ],
+    );
+  }
+
   Widget FeeTextField() {
     final TextEditingController controller = TextEditingController(
       text: fee.toString(),
@@ -214,76 +229,134 @@ class FormPageState extends ConsumerState<FormPage> {
     return Row(
       children: [
         SizedBox(
-              width: 80,
-              child: TextField(
-                controller: controller,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  labelText: '交通手当',
-                ),
-                onChanged: (value) {
-                  fee = int.parse(value);
-                },
-              ),
-            ),
-            const Padding(
-              padding:  EdgeInsets.only(left: 10),
-              child:  Text('円' , style: TextStyle(fontSize: 12)),
-            ),
-      ],
-    );
-
-  RootTextField() {
-    return Row(
-      children: [
-        Expanded(
+          width: 80,
           child: TextField(
-            controller: _routeController,
+            controller: controller,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            keyboardType: TextInputType.number,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              labelText: '通勤経路',
+              filled: true,
+              labelText: '交通手当',
             ),
+            onChanged: (value) {
+              fee = int.parse(value);
+            },
           ),
         ),
-        Row(
-          children: [
-            IconButton(
-              onPressed: () {
-                _routeController.text += "→";
-              },
-              icon: const Icon(Icons.arrow_forward),
-            ),
-            const SizedBox(height: 5),
-            IconButton(
-              onPressed: () {
-                _routeController.text += "↔︎";              
-                },
-              icon: const Icon(Icons.compare_arrows)
-            ),
-          ],
+        const Padding(
+          padding: EdgeInsets.only(left: 4),
+          child: Text('円', style: TextStyle(fontSize: 12)),
         ),
-
       ],
     );
   }
 
+  Widget TimeSelectField() {
+    return Row(
+      children: [
+        Column(
+          children: [
+            TimeSelectButton(context, TimeSelectButtonMode.startTimeMode),
+            const SizedBox(
+              height: 10,
+            ),
+            TimeSelectButton(context, TimeSelectButtonMode.endTimeMode),
+          ],
+        ),
+        const SizedBox(width: 40),
+        BreakTimeTextField(),
+      ],
+    );
+  }
 
+  Widget BreakTimeTextField() {
+    final TextEditingController _breakTimeController = TextEditingController(
+      text: breakTime.toString(),
+    );
+
+    return Row(
+      children: [
+        SizedBox(
+          width: 80,
+          child: TextField(
+            controller: _breakTimeController,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              filled: true,
+              labelText: '休憩時間',
+            ),
+            onChanged: (value) {
+              fee = int.parse(value);
+            },
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 4),
+          child: Text('分', style: TextStyle(fontSize: 12)),
+        ),
+      ],
+    );
+  }
+
+  RootTextField() {
+    return SizedBox(
+      width: 180,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              style: const TextStyle(fontSize: 14), // ← フォントサイズを小さく
+              controller: _routeController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '通勤経路',
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              IconButton(
+                onPressed: () {
+                  _routeController.text += "→";
+                },
+                icon: const Icon(Icons.arrow_forward, size: 18),
+                padding: EdgeInsets.all(1), // ← パディングをゼロにする
+      constraints: BoxConstraints(), // ← 最小限サイズに抑える
+              ),
+              IconButton(
+                  onPressed: () {
+                    _routeController.text += "↔︎";
+                  },
+                  icon: const Icon(Icons.compare_arrows, size: 18),
+                padding: EdgeInsets.all(1), // ← パディングをゼロにする
+      constraints: BoxConstraints(), // ← 最小限サイズに抑える
+                  ),
+                  
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget DescriptionTextField() {
-    return TextFormField(
-      initialValue: description,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
-        labelText: '備考',
+    return SizedBox(
+      width: 400,
+      child: TextField(
+        style: const TextStyle(fontSize: 14), // ← フォントサイズを小さく
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          filled: true,
+          labelText: '備考',
+        ),
+        onChanged: (value) {
+          description = value;
+        },
+        maxLines: 2,
       ),
-      onChanged: (value) {
-        description = value;
-      },
-      maxLines: 3,
     );
   }
 
@@ -319,16 +392,33 @@ class FormPageState extends ConsumerState<FormPage> {
           endTime!,
           fee,
           description,
-
           UserManager().getUserId(selectedUser),
-          helperId);
+          helperId,
+          breakTime,
+          commutingRoute);
     } else if (mode == OpenFormPageMode.add) {
-      ref.read(reportListProvider.notifier).addReport(date, startTime!,
-          endTime!, fee, description, UserManager().getUserId(selectedUser), helperId);
+      ref.read(reportListProvider.notifier).addReport(
+          date,
+          startTime!,
+          endTime!,
+          fee,
+          description,
+          UserManager().getUserId(selectedUser),
+          helperId,
+          breakTime,
+          commutingRoute);
     } else if (mode == OpenFormPageMode.workTap && workId != null) {
-      ref.read(reportListProvider.notifier).addRelatedReport(date, startTime!,
-          endTime!, fee, description, UserManager().getUserId(selectedUser), helperId, workId!);
-
+      ref.read(reportListProvider.notifier).addRelatedReport(
+          date,
+          startTime!,
+          endTime!,
+          fee,
+          description,
+          UserManager().getUserId(selectedUser),
+          helperId,
+          workId!,
+          breakTime,
+          commutingRoute);
     }
   }
 
@@ -355,22 +445,21 @@ class FormPageState extends ConsumerState<FormPage> {
       },
     );
     if (picked != null) {
-    setState(() {
-      final newTime = DateTime(
-        startTime!.year,
-        startTime!.month,
-        startTime!.day,
-        picked.hour,
-        picked.minute,
-      );
-      if (timeLabel == TimeLabel.startTime) {
-        startTime = newTime;
-      } else {
-        endTime = newTime;
-      }
-    });
-  }
-
+      setState(() {
+        final newTime = DateTime(
+          startTime!.year,
+          startTime!.month,
+          startTime!.day,
+          picked.hour,
+          picked.minute,
+        );
+        if (timeLabel == TimeLabel.startTime) {
+          startTime = newTime;
+        } else {
+          endTime = newTime;
+        }
+      });
+    }
   }
 }
 
@@ -403,7 +492,7 @@ class _FormDatePickerState extends State<_FormDatePicker> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        TextButton(
+        ElevatedButton(
           child: const Text('日付'),
           onPressed: () async {
             var newDate = await showDatePicker(
@@ -419,7 +508,13 @@ class _FormDatePickerState extends State<_FormDatePicker> {
             }
             widget.onChanged(newDate);
           },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 254, 237, 237),
+            foregroundColor: Colors.black, // 文字色
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
         ),
+        SizedBox(width: 8,),
         Text(
           DateFormat('yyyy年MM月dd日').format(widget.date),
         ),
@@ -427,61 +522,3 @@ class _FormDatePickerState extends State<_FormDatePicker> {
     );
   }
 }
-
-
-  // RootTextField() {
-  //   final TextEditingController departure_controller = TextEditingController();
-  //   final TextEditingController destination_controller =
-  //       TextEditingController();
-
-  //   const List<String> trip_list = <String>['片道', '往復'];
-  //   String dropdownValue = trip_list.first;
-
-  //   return Row(
-  //     children: [
-  //       SizedBox(
-  //         width: 80,
-  //         child: TextField(
-  //           controller: departure_controller,
-  //           decoration: const InputDecoration(
-  //             border: OutlineInputBorder(),
-  //             labelText: '出発地',
-  //           ),
-  //           onChanged: (value) {
-  //             departure = value;
-  //           },
-  //         ),
-  //       ),
-  //       const SizedBox(width: 20), // ここで間隔を追加
-  //       SizedBox(
-  //           width: 120,
-  //           child: DropdownMenu<String>(
-  //             initialSelection: trip_list.first,
-  //             onSelected: (String? value) {
-  //               // This is called when the user selects an item.
-  //               setState(() {
-  //                 dropdownValue = value!;
-  //               });
-  //             },
-  //             dropdownMenuEntries:
-  //                 trip_list.map<DropdownMenuEntry<String>>((String value) {
-  //               return DropdownMenuEntry<String>(value: value, label: value);
-  //             }).toList(),
-  //           )),
-  //       const SizedBox(width: 20), // ここで間隔を追加
-  //       SizedBox(
-  //         width: 80,
-  //         child: TextField(
-  //           controller: destination_controller,
-  //           decoration: const InputDecoration(
-  //             border: OutlineInputBorder(),
-  //             labelText: '到着地',
-  //           ),
-  //           onChanged: (value) {
-  //             destination = value;
-  //           },
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }

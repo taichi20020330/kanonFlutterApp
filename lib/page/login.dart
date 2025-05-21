@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kanon_app/module/bottom_navigation.dart';
 import 'package:kanon_app/page/register.dart';
+import 'package:kanon_app/page/report_list_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -80,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                         // チャット画面に遷移＋ログイン画面を破棄
                         await Navigator.of(context).pushReplacement(
                           MaterialPageRoute(builder: (context) {
-                            return BottomNavigationPage();
+                            return ReportListPage();
                           }),
                         );
                       } catch (e) {

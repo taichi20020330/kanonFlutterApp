@@ -72,25 +72,45 @@ class MyApp extends StatelessWidget {
                 onError: Colors.white,
                 brightness: Brightness.light,
               ),
+              textTheme: Theme.of(context).textTheme.apply(
+              fontSizeDelta: -1.0,
+            ),
             ),
             home: ReportListPage(),
           );
         } else {
           // ログインしていない場合の表示するウィジェット
-          return  const MaterialApp(
-            localizationsDelegates:  [
+          return  MaterialApp(
+            localizationsDelegates:  const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: [
+            supportedLocales: const [
               Locale('ja'),
             ],
-            locale: Locale('ja'),
+            locale: const Locale('ja'),
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
+            theme: ThemeData(
+              colorScheme:  const ColorScheme(
+                primary: Color(0xFFEF9A9A),  // 薄いピンク
+                secondary: Color(0xFFE57373),  // 少し濃いピンク
+                surface: Colors.white,
+                error: Colors.red,
+                onPrimary: Colors.black,
+                onSecondary: Colors.black,
+                onSurface: Colors.black,
+                onError: Colors.white,
+                brightness: Brightness.light,
+              ),
+              textTheme: Theme.of(context).textTheme.apply(
+              fontSizeDelta: -1.0,
+            ),
+            ),
+            
 
-            home: LoginPage(),
+            home: const LoginPage(),
           );
         }
       },

@@ -54,7 +54,8 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
                           description: doc['description'],
                           date: doc['date'].toDate(),
                           deleteFlag: doc['deleteFlag'],
-                          commutingRoute: doc['commutingRoute']
+                          commutingRoute: doc['commutingRoute'],
+                          breakTime: doc['breakTime']
                           ))
                       .toList() ??
                   [];
@@ -176,7 +177,7 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
 
 Widget SalaryText(double monthlySalary) {
   return Text(
-    '給与: ${monthlySalary.toInt()}円',
+    '給与（だいたい）: ${monthlySalary.toInt()}円',
     style: const TextStyle(
       fontSize: 14,
       color: Colors.grey,

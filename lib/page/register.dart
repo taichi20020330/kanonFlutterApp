@@ -20,8 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('新規登録'),
-        backgroundColor: Colors.blue,
+        title: const Text('新規登録'),
       ),
       body: Center(
         child: Container(
