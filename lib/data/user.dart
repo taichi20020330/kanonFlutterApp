@@ -9,7 +9,6 @@ class User {
     required this.name,
   });
 
-  
 
   User copyWith({
     int? id,
