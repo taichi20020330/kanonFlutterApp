@@ -1,28 +1,28 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+// // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'work.dart';
+// part of 'work.dart';
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
+// // **************************************************************************
+// // JsonSerializableGenerator
+// // **************************************************************************
 
-_$WorkImpl _$$WorkImplFromJson(Map<String, dynamic> json) => _$WorkImpl(
-      id: json['id'] as String,
-      date: DateTime.parse(json['date'] as String),
-      scheduledStartTime: json['scheduledStartTime'] as int,
-      scheduledEndTime: json['scheduledEndTime'] as int,
-      userId: json['userId'] as int,
-      helperId: json['helperId'] as String,
-      isReported: json['isReported'] as bool,
-    );
+// _$WorkImpl _$$WorkImplFromJson(Map<String, dynamic> json) => _$WorkImpl(
+//       id: json['id'] as String,
+//       date: DateTime.parse(json['date'] as String),
+//       scheduledStartTime: json['scheduledStartTime'] as int,
+//       scheduledEndTime: json['scheduledEndTime'] as int,
+//       userId: json['userId'] as int,
+//       helperId: json['helperId'] as String,
+//       isReported: json['isReported'] as bool,
+//     );
 
-Map<String, dynamic> _$$WorkImplToJson(_$WorkImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'date': instance.date.toIso8601String(),
-      'scheduledStartTime': instance.scheduledStartTime,
-      'scheduledEndTime': instance.scheduledEndTime,
-      'userId': instance.userId,
-      'helperId': instance.helperId,
-      'isReported': instance.isReported,
-    };
+// Map<String, dynamic> _$$WorkImplToJson(_$WorkImpl instance) =>
+//     <String, dynamic>{
+//       'id': instance.id,
+//       'date': instance.date.toIso8601String(),
+//       'scheduledStartTime': instance.scheduledStartTime,
+//       'scheduledEndTime': instance.scheduledEndTime,
+//       'userId': instance.userId,
+//       'helperId': instance.helperId,
+//       'isReported': instance.isReported,
+//     };

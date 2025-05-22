@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanon_app/data/utils.dart';
+import 'package:kanon_app/page/report_list_page.dart';
 import 'package:kanon_app/repository/user_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:kanon_app/data/enum.dart';
@@ -67,21 +69,22 @@ class FormPageState extends ConsumerState<FormPage> {
       description = currentReport!.description!;
       _routeController.text = currentReport!.commutingRoute!;
       selectedUser = UserManager().getUserName(currentReport!.user);
-    } else if (mode == OpenFormPageMode.workTap) {
-      currentReport = widget.currentReport;
-      id = currentReport?.id;
-      date = currentReport!.date;
-      startTime = currentReport!.startTime;
-      endTime = currentReport!.endTime;
-      fee = currentReport!.fee!;
-      description = currentReport!.description!;
-      selectedUser = UserManager().getUserName(currentReport!.user);
-      workId = widget.workId;
-      _routeController.text = currentReport!.commutingRoute!;
     }
+    // } else if (mode == OpenFormPageMode.workTap) {
+    //   // currentReport = widget.currentReport;
+    //   // id = currentReport?.id;
+    //   // date = currentReport!.date;
+    //   // startTime = currentReport!.startTime;
+    //   // endTime = currentReport!.endTime;
+    //   // fee = currentReport!.fee!;
+    //   // description = currentReport!.description!;
+    //   // selectedUser = UserManager().getUserName(currentReport!.user);
+    //   // workId = widget.workId;
+    //   // _routeController.text = currentReport!.commutingRoute!;
+    // }
 
     // "ref" can be used in all life-cycles of a StatefulWidget.
-    ref.read(reportListProvider);
+    // ref.read(reportListProvider);
   }
 
   @override
@@ -174,7 +177,9 @@ class FormPageState extends ConsumerState<FormPage> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
-        SizedBox(width: 8,),
+        SizedBox(
+          width: 8,
+        ),
         Text((selectTime != null)
             ? "${selectTime.hour}時${selectTime.minute}分"
             : ""),
@@ -324,17 +329,16 @@ class FormPageState extends ConsumerState<FormPage> {
                 },
                 icon: const Icon(Icons.arrow_forward, size: 18),
                 padding: EdgeInsets.all(1), // ← パディングをゼロにする
-      constraints: BoxConstraints(), // ← 最小限サイズに抑える
+                constraints: BoxConstraints(), // ← 最小限サイズに抑える
               ),
               IconButton(
-                  onPressed: () {
-                    _routeController.text += "↔︎";
-                  },
-                  icon: const Icon(Icons.compare_arrows, size: 18),
+                onPressed: () {
+                  _routeController.text += "↔︎";
+                },
+                icon: const Icon(Icons.compare_arrows, size: 18),
                 padding: EdgeInsets.all(1), // ← パディングをゼロにする
-      constraints: BoxConstraints(), // ← 最小限サイズに抑える
-                  ),
-                  
+                constraints: BoxConstraints(), // ← 最小限サイズに抑える
+              ),
             ],
           ),
         ],
@@ -382,44 +386,66 @@ class FormPageState extends ConsumerState<FormPage> {
   void addReportToFirebase() {
     final auth = FirebaseAuth.instance;
     final helperId = auth.currentUser?.uid.toString() ?? '';
+    final notifier = ref.read(reportListProvider.notifier);
 
-    //idが存在する場合は編集
+    final report = Report(
+      id: '', // 新規追加時は空にしておく
+      date: date,
+      startTime: startTime!,
+      endTime: endTime!,
+      roundUpEndTime: roundTimeToNearest15Minutes(endTime!),
+      fee: fee,
+      description: description,
+      user: UserManager().getUserId(selectedUser),
+      helperId: helperId,
+      deleteFlag: false,
+      breakTime: breakTime,
+      commutingRoute: commutingRoute,
+    );
     if (mode == OpenFormPageMode.edit) {
-      ref.read(reportListProvider.notifier).updateReport(
-          currentReport!.id,
-          date,
-          startTime!,
-          endTime!,
-          fee,
-          description,
-          UserManager().getUserId(selectedUser),
-          helperId,
-          breakTime,
-          commutingRoute);
-    } else if (mode == OpenFormPageMode.add) {
-      ref.read(reportListProvider.notifier).addReport(
-          date,
-          startTime!,
-          endTime!,
-          fee,
-          description,
-          UserManager().getUserId(selectedUser),
-          helperId,
-          breakTime,
-          commutingRoute);
-    } else if (mode == OpenFormPageMode.workTap && workId != null) {
-      ref.read(reportListProvider.notifier).addRelatedReport(
-          date,
-          startTime!,
-          endTime!,
-          fee,
-          description,
-          UserManager().getUserId(selectedUser),
-          helperId,
-          workId!,
-          breakTime,
-          commutingRoute);
+      notifier.updateReport(report.copyWith(id: currentReport!.id));
+    } else {
+      notifier.addReport(report);
     }
+
+    // //idが存在する場合は編集
+    // if (mode == OpenFormPageMode.edit) {
+    //   ref.read(reportListProvider.notifier).updateReport(
+    //       currentReport!.id,
+    //       date,
+    //       startTime!,
+    //       endTime!,
+    //       fee,
+    //       description,
+    //       UserManager().getUserId(selectedUser),
+    //       helperId,
+    //       breakTime,
+    //       commutingRoute);
+    // } else if (mode == OpenFormPageMode.add) {
+    //   ref.read(reportListProvider.notifier).addReport(
+    //       date,
+    //       startTime!,
+    //       endTime!,
+    //       fee,
+    //       description,
+    //       UserManager().getUserId(selectedUser),
+    //       helperId,
+    //       breakTime,
+    //       commutingRoute);
+    // }
+    // } else if (mode == OpenFormPageMode.workTap && workId != null) {
+    //   ref.read(reportListProvider.notifier).addRelatedReport(
+    //       date,
+    //       startTime!,
+    //       endTime!,
+    //       fee,
+    //       description,
+    //       UserManager().getUserId(selectedUser),
+    //       helperId,
+    //       workId!,
+    //       breakTime,
+    //       commutingRoute);
+    // }
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {
@@ -514,7 +540,9 @@ class _FormDatePickerState extends State<_FormDatePicker> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
-        SizedBox(width: 8,),
+        SizedBox(
+          width: 8,
+        ),
         Text(
           DateFormat('yyyy年MM月dd日').format(widget.date),
         ),
