@@ -268,7 +268,7 @@ class CardMenuTrailing extends HookConsumerWidget {
             break;
           case 'delete':
             ref.read(reportListProvider.notifier).deleteReport(report.id);
-            break;
+            break
         }
       },
     );
