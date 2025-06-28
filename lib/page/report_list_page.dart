@@ -10,6 +10,7 @@ import 'package:kanon_app/main.dart';
 import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/page/logout.dart';
 import 'package:kanon_app/repository/user_manager.dart';
+import 'package:uuid/uuid.dart';
 
 import '../ model/report_list_notifier.dart';
 import '../ model/user_list_notifier.dart';
@@ -17,12 +18,12 @@ import '../ model/user_list_notifier.dart';
 final reportListProvider =
     StateNotifierProvider<ReportListNotifier, List<Report>>(
         (ref) => ReportListNotifier());
-final userListProvider = StateNotifierProvider<UserListNotifier, List<User>>((ref) {
+final userListProvider =
+    StateNotifierProvider<UserListNotifier, List<User>>((ref) {
   return UserListNotifier();
 });
 
 final _currentReport = Provider<Report>((ref) => throw UnimplementedError());
-
 
 class ReportListPage extends ConsumerStatefulWidget {
   @override
@@ -51,8 +52,7 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
       return const Center(child: CircularProgressIndicator());
     }
 
-    sortedReports = [...reports]
-      ..sort((a, b) => a.date.compareTo(b.date));
+    sortedReports = [...reports]..sort((a, b) => a.date.compareTo(b.date));
 
     groupedReports = groupReportsByMonth(sortedReports);
     final int tabInitialIndex = getTabInitialIndex(groupedReports);
@@ -195,7 +195,6 @@ int getTabInitialIndex(Map<String, List<Report>> groupedReports) {
   return tabInitialIndex;
 }
 
-
 class ReportItem extends HookConsumerWidget {
   const ReportItem({Key? key}) : super(key: key);
 
@@ -207,7 +206,8 @@ class ReportItem extends HookConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
     final userName = users
-        .firstWhere((u) => u.id == report.user, orElse: () => User(id: -1, name: "Unknown"))
+        .firstWhere((u) => u.id == report.user,
+            orElse: () => User(id: -1, name: "Unknown"))
         .name;
 
     String formattedDate = DateFormat('yyyy年MM月dd日').format(report.date);
@@ -215,9 +215,7 @@ class ReportItem extends HookConsumerWidget {
     return Material(
       child: Card(
         child: ListTile(
-          title: Text(
-            userName
-          ),
+          title: Text(userName),
           subtitle: Text(
               '$formattedDate ${formatTime(report.startTime)} ~ ${formatTime(report.endTime)}'),
           trailing: const CardMenuTrailing(),
@@ -248,6 +246,8 @@ class CardMenuTrailing extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final report = ref.watch(_currentReport);
+    final notifier = ref.read(reportListProvider.notifier);
+
     return PopupMenuButton(
       itemBuilder: (context) {
         return [
@@ -259,6 +259,10 @@ class CardMenuTrailing extends HookConsumerWidget {
             value: 'delete',
             child: Text('削除'),
           ),
+          const PopupMenuItem(
+            value: 'dup',
+            child: Text('複製'),
+          ),
         ];
       },
       onSelected: (String value) {
@@ -268,7 +272,20 @@ class CardMenuTrailing extends HookConsumerWidget {
             break;
           case 'delete':
             ref.read(reportListProvider.notifier).deleteReport(report.id);
-            break
+            break;
+          case 'dup':
+            final newId = const Uuid().v4();
+            Report new_report = report.copyWith(
+              id: newId,
+              startTime: report.startTime.add(const Duration(days: 7)),
+              endTime: report.endTime.add(const Duration(days: 7)),
+              roundUpEndTime:
+                  report.roundUpEndTime.add(const Duration(days: 7)),
+              date: report.date.add(const Duration(days: 7)),
+              description: '', // 説明を消す
+            );
+            notifier.addReport(new_report);
+            break;
         }
       },
     );

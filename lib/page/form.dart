@@ -227,7 +227,7 @@ class FormPageState extends ConsumerState<FormPage> {
   }
 
   Widget FeeTextField() {
-    final TextEditingController controller = TextEditingController(
+    final TextEditingController _feeController = TextEditingController(
       text: fee.toString(),
     );
 
@@ -236,7 +236,7 @@ class FormPageState extends ConsumerState<FormPage> {
         SizedBox(
           width: 80,
           child: TextField(
-            controller: controller,
+            controller: _feeController,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
@@ -294,7 +294,7 @@ class FormPageState extends ConsumerState<FormPage> {
               labelText: '休憩時間',
             ),
             onChanged: (value) {
-              fee = int.parse(value);
+              breakTime = int.parse(value);
             },
           ),
         ),
@@ -370,8 +370,6 @@ class FormPageState extends ConsumerState<FormPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
       );
-      print(startTime);
-      print(endTime);
     } else {
       if (_formKey.currentState!.validate()) {
         addReportToFirebase();

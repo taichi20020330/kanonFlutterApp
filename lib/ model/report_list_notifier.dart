@@ -39,10 +39,7 @@ class ReportListNotifier extends StateNotifier<List<Report>> {
   }
 
   Future<void> addReport(Report report) async {
-    final doc = await _db.collection('reports').add(report.toMap());
-
-    final added = report.copyWith(id: doc.id);
-    state = [...state, added];
+    await _db.collection('reports').add(report.toMap());
   }
 
   Future<void> updateReport(Report report) async {
