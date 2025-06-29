@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kanon_app/data/riverpod_providers.dart';
 import 'package:kanon_app/data/utils.dart';
 import 'package:kanon_app/page/report_list_page.dart';
 import 'package:kanon_app/repository/user_manager.dart';
@@ -46,7 +47,6 @@ class FormPageState extends ConsumerState<FormPage> {
   String? workId;
   late OpenFormPageMode mode;
 
-  late List<String> userNames;
   final TextEditingController userController = TextEditingController();
   final TextEditingController _routeController = TextEditingController();
 
@@ -127,7 +127,15 @@ class FormPageState extends ConsumerState<FormPage> {
                                 },
                               ),
                               TimeSelectField(),
-                              UserLabelButton(selectedUser),
+                              UserLabelButton(
+                                userName: selectedUser,
+                                userController: userController,
+                                onSelected: (newName) {
+                                  setState(() {
+                                    selectedUser = newName;
+                                  });
+                                },
+                              ),
                               CommutingTextField(),
                               DescriptionTextField(),
                               RegisterButton(),
@@ -184,25 +192,6 @@ class FormPageState extends ConsumerState<FormPage> {
             ? "${selectTime.hour}時${selectTime.minute}分"
             : ""),
       ],
-    );
-  }
-
-  UserLabelButton(String userName) {
-    return DropdownMenu<String>(
-      initialSelection: userName,
-      controller: userController,
-      requestFocusOnTap: true,
-      label: const Text('利用者'),
-      onSelected: (String? newUserName) {
-        setState(() {
-          selectedUser = newUserName!;
-        });
-      },
-      dropdownMenuEntries: UserManager()
-          .getAllUserName()
-          .map<DropdownMenuEntry<String>>((String value) {
-        return DropdownMenuEntry<String>(value: value, label: value);
-      }).toList(),
     );
   }
 
@@ -405,45 +394,6 @@ class FormPageState extends ConsumerState<FormPage> {
     } else {
       notifier.addReport(report);
     }
-
-    // //idが存在する場合は編集
-    // if (mode == OpenFormPageMode.edit) {
-    //   ref.read(reportListProvider.notifier).updateReport(
-    //       currentReport!.id,
-    //       date,
-    //       startTime!,
-    //       endTime!,
-    //       fee,
-    //       description,
-    //       UserManager().getUserId(selectedUser),
-    //       helperId,
-    //       breakTime,
-    //       commutingRoute);
-    // } else if (mode == OpenFormPageMode.add) {
-    //   ref.read(reportListProvider.notifier).addReport(
-    //       date,
-    //       startTime!,
-    //       endTime!,
-    //       fee,
-    //       description,
-    //       UserManager().getUserId(selectedUser),
-    //       helperId,
-    //       breakTime,
-    //       commutingRoute);
-    // }
-    // } else if (mode == OpenFormPageMode.workTap && workId != null) {
-    //   ref.read(reportListProvider.notifier).addRelatedReport(
-    //       date,
-    //       startTime!,
-    //       endTime!,
-    //       fee,
-    //       description,
-    //       UserManager().getUserId(selectedUser),
-    //       helperId,
-    //       workId!,
-    //       breakTime,
-    //       commutingRoute);
-    // }
   }
 
   Future<void> _selectTime(BuildContext context, TimeLabel timeLabel) async {
@@ -545,6 +495,42 @@ class _FormDatePickerState extends State<_FormDatePicker> {
           DateFormat('yyyy年MM月dd日').format(widget.date),
         ),
       ],
+    );
+  }
+}
+
+class UserLabelButton extends ConsumerWidget {
+  final String userName;
+  final TextEditingController userController;
+  final Function(String) onSelected;
+
+  const UserLabelButton({
+    super.key,
+    required this.userName,
+    required this.userController,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteUsers = ref.watch(favoriteUserListProvider);
+
+    return DropdownMenu<String>(
+      initialSelection: userName,
+      controller: userController,
+      requestFocusOnTap: true,
+      label: const Text('利用者'),
+      onSelected: (String? newUserName) {
+        if (newUserName != null) {
+          onSelected(newUserName);
+        }
+      },
+      dropdownMenuEntries: favoriteUsers.map<DropdownMenuEntry<String>>((user) {
+        return DropdownMenuEntry<String>(
+          value: user.name,
+          label: user.name,
+        );
+      }).toList(),
     );
   }
 }
