@@ -14,6 +14,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String email = '';
   String password = '';
+  String username = '';
   String infoText = '';
 
   @override
@@ -28,6 +29,19 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'ユーザーネームを入力してください',
+                  ),
+                  onChanged: (String value) {
+                    setState(() {
+                      username = value;
+                    });
+                  },
+                ),
+              ),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
