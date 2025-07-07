@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kanon_app/data/report.dart';
+import 'package:kanon_app/data/work_cateogory.dart';
 
 class ReportListNotifier extends StateNotifier<List<Report>> {
   ReportListNotifier() : super([]) {
@@ -9,6 +10,16 @@ class ReportListNotifier extends StateNotifier<List<Report>> {
   }
 
   final _db = FirebaseFirestore.instance;
+  Future<List<WorkCategory>> fetchCategories() async {
+    print("fetch cate");
+
+    final snapshot =
+        await FirebaseFirestore.instance.collection('workCategories').get();
+    final result =
+        snapshot.docs.map((doc) => WorkCategory.fromMap(doc)).toList();
+
+    return result;
+  }
 
   void _fetchReports() {
     _db
@@ -31,10 +42,12 @@ class ReportListNotifier extends StateNotifier<List<Report>> {
           deleteFlag: data['deleteFlag'],
           commutingRoute: data['commutingRoute'],
           breakTime: data['breakTime'],
+          workCategory: data['workCategory'] != null
+              ? Map<String, dynamic>.from(data['workCategory'])
+              : null,
         );
       }).toList();
       state = reports;
-      print("state更新");
     });
   }
 
@@ -74,6 +87,4 @@ class ReportListNotifier extends StateNotifier<List<Report>> {
     await _db.collection('reports').doc(id).update({'deleteFlag': true});
     state = state.where((r) => r.id != id).toList();
   }
-
-  
 }

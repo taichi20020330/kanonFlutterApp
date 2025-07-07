@@ -48,7 +48,6 @@ class _ReportListPageState extends ConsumerState<ReportListPage>
   Widget build(BuildContext context) {
     final reports = ref.watch(reportListProvider);
     if (reports.isEmpty) {
-      // まだデータがない（初期状態やロード中）
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -191,6 +190,7 @@ int getTabInitialIndex(Map<String, List<Report>> groupedReports) {
   int tabInitialIndex = 0;
   if (groupedReports.containsKey(formattedNow)) {
     tabInitialIndex = groupedReports.keys.toList().indexOf(formattedNow);
+    
   }
   return tabInitialIndex;
 }
@@ -256,13 +256,14 @@ class CardMenuTrailing extends HookConsumerWidget {
             child: Text('編集'),
           ),
           const PopupMenuItem(
+            value: 'dup',
+            child: Text('1週間後の記録を複製'),
+          ),
+          const PopupMenuItem(
             value: 'delete',
             child: Text('削除'),
           ),
-          const PopupMenuItem(
-            value: 'dup',
-            child: Text('複製'),
-          ),
+          
         ];
       },
       onSelected: (String value) {
