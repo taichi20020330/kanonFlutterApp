@@ -18,6 +18,6 @@ class PageNotifier extends Notifier<PageType> {
 }
 
 final favoriteUserListProvider =
-    StateNotifierProvider<FavoriteUserListNotifier, List<data.User>>(
+  StateNotifierProvider<FavoriteUserListNotifier, List<data.User>>(
   (ref) => FavoriteUserListNotifier(),
 );

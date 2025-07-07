@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanon_app/data/work_cateogory.dart';
 
 @immutable
 class Report {
@@ -14,7 +15,8 @@ class Report {
   final String? commutingRoute;
   final int? breakTime;
   final bool deleteFlag;
-
+  final Map<String, dynamic>? workCategory;
+  
   const Report({
     required this.id,
     required this.startTime,
@@ -28,6 +30,7 @@ class Report {
     required this.date,
     required this.deleteFlag,
     this.commutingRoute,
+    this.workCategory, 
   });
 
   Map<String, dynamic> toMap() {
@@ -43,8 +46,10 @@ class Report {
       'deleteFlag': deleteFlag,
       'commutingRoute': commutingRoute,
       'breakTime': breakTime,
+      'workCategory': workCategory,
     };
   }
+  
 
   Report copyWith({
     String? id,
@@ -59,6 +64,7 @@ class Report {
     bool? deleteFlag,
     String? commutingRoute,
     int? breakTime,
+    Map<String, dynamic>? workCategory,
   }) {
     return Report(
       id: id ?? this.id,
@@ -73,6 +79,7 @@ class Report {
       deleteFlag: deleteFlag ?? this.deleteFlag,
       commutingRoute: commutingRoute ?? this.commutingRoute,
       breakTime: breakTime ?? this.breakTime,
+      workCategory: workCategory ?? this.workCategory,
     );
   }
 

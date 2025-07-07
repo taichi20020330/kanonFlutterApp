@@ -2,18 +2,20 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+import 'package:kanon_app/data/enum.dart';
+import 'package:kanon_app/data/report.dart';
 import 'package:kanon_app/data/riverpod_providers.dart';
 import 'package:kanon_app/data/utils.dart';
+import 'package:kanon_app/data/work_cateogory.dart';
 import 'package:kanon_app/page/report_list_page.dart';
 import 'package:kanon_app/repository/user_manager.dart';
-import 'package:intl/intl.dart';
-import 'package:kanon_app/data/enum.dart';
-import 'package:kanon_app/main.dart';
-import 'package:kanon_app/data/report.dart';
 
 class FormPage extends ConsumerStatefulWidget {
   FormPage({required this.mode, this.currentReport, this.workId, super.key});
@@ -46,6 +48,9 @@ class FormPageState extends ConsumerState<FormPage> {
   Report? currentReport;
   String? workId;
   late OpenFormPageMode mode;
+  List<WorkCategory> categories = [];
+  String? selectedSubCategory;
+  WorkCategory? selectedParentCategory;
 
   final TextEditingController userController = TextEditingController();
   final TextEditingController _routeController = TextEditingController();
@@ -58,7 +63,6 @@ class FormPageState extends ConsumerState<FormPage> {
         commutingRoute = _routeController.text;
       });
     });
-
     if (mode == OpenFormPageMode.edit) {
       currentReport = widget.currentReport;
       id = currentReport?.id;
@@ -69,31 +73,34 @@ class FormPageState extends ConsumerState<FormPage> {
       description = currentReport!.description!;
       _routeController.text = currentReport!.commutingRoute!;
       selectedUser = UserManager().getUserName(currentReport!.user);
+      
     }
-    // } else if (mode == OpenFormPageMode.workTap) {
-    //   // currentReport = widget.currentReport;
-    //   // id = currentReport?.id;
-    //   // date = currentReport!.date;
-    //   // startTime = currentReport!.startTime;
-    //   // endTime = currentReport!.endTime;
-    //   // fee = currentReport!.fee!;
-    //   // description = currentReport!.description!;
-    //   // selectedUser = UserManager().getUserName(currentReport!.user);
-    //   // workId = widget.workId;
-    //   // _routeController.text = currentReport!.commutingRoute!;
-    // }
+    _loadCategories();
+  }
 
-    // "ref" can be used in all life-cycles of a StatefulWidget.
-    // ref.read(reportListProvider);
+  Future<void> _loadCategories() async {
+    final result =
+        await ref.read(reportListProvider.notifier).fetchCategories();
+    setState(() {
+      categories = result;
+
+    if (mode == OpenFormPageMode.edit && currentReport != null) {
+      final reportCatId = currentReport!.workCategory?['categoryId'];
+      final reportSubName = currentReport!.workCategory?['childName'];
+
+      selectedParentCategory =
+          categories.firstWhere((cat) => cat.id == reportCatId);
+
+      if (selectedParentCategory != null &&
+          selectedParentCategory!.sub.contains(reportSubName)) {
+        selectedSubCategory = reportSubName;
+      }
+    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Future(() {
-    //   final userListModel = context.read<UserListModel>();
-    //   userListModel.getUsers();
-    // });
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('仕事の記録'),
@@ -138,6 +145,7 @@ class FormPageState extends ConsumerState<FormPage> {
                               ),
                               CommutingTextField(),
                               DescriptionTextField(),
+                              WorkCategoryDropdowns(),
                               RegisterButton(),
                             ].expand(
                               (widget) => [
@@ -185,7 +193,7 @@ class FormPageState extends ConsumerState<FormPage> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 8,
         ),
         Text((selectTime != null)
@@ -302,7 +310,7 @@ class FormPageState extends ConsumerState<FormPage> {
         children: [
           Expanded(
             child: TextField(
-              style: const TextStyle(fontSize: 14), // ← フォントサイズを小さく
+              style: const TextStyle(fontSize: 14),
               controller: _routeController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -353,22 +361,77 @@ class FormPageState extends ConsumerState<FormPage> {
     );
   }
 
-  _comfirmForm(BuildContext context) async {
-    // isCorrectTimeがfalseの場合はエラーを表示
-    if (!isCorrectTime(startTime!, endTime!)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
-      );
-    } else {
-      if (_formKey.currentState!.validate()) {
-        addReportToFirebase();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('登録しました')),
-        );
-      }
-      Navigator.pop(context);
-    }
+  Widget WorkCategoryDropdowns() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButton<WorkCategory>(
+          hint: Text('カテゴリーを選択'),
+          value: selectedParentCategory,
+          items: categories.map((cat) {
+            return DropdownMenuItem<WorkCategory>(
+              value: cat,
+              child: Text(cat.name),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedParentCategory = value;
+              selectedSubCategory = null;
+            });
+          },
+        ),
+        if (selectedParentCategory != null &&
+            selectedParentCategory!.sub.isNotEmpty)
+          DropdownButton<String>(
+            hint: Text('サブカテゴリーを選択'),
+            value: selectedSubCategory,
+            items: selectedParentCategory!.sub.map((sub) {
+              return DropdownMenuItem<String>(
+                value: sub,
+                child: Text(sub),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedSubCategory = value!;
+              });
+            },
+          ),
+      ],
+    );
   }
+
+  _comfirmForm(BuildContext context) async {
+  if (selectedUser.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('利用者を選択してください')),
+    );
+    return; 
+  }
+
+  if (selectedParentCategory == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('カテゴリーを選択してください')),
+    );
+    return;
+  }
+
+  if (!isCorrectTime(startTime!, endTime!)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('開始時間は終了時間より前に設定してください')),
+    );
+    return;
+  }
+
+  if (_formKey.currentState!.validate()) {
+    addReportToFirebase();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('登録しました')),
+    );
+    Navigator.pop(context);
+  }
+}
 
   void addReportToFirebase() {
     final auth = FirebaseAuth.instance;
@@ -376,19 +439,23 @@ class FormPageState extends ConsumerState<FormPage> {
     final notifier = ref.read(reportListProvider.notifier);
 
     final report = Report(
-      id: '', // 新規追加時は空にしておく
-      date: date,
-      startTime: startTime!,
-      endTime: endTime!,
-      roundUpEndTime: roundTimeToNearest15Minutes(endTime!),
-      fee: fee,
-      description: description,
-      user: UserManager().getUserId(selectedUser),
-      helperId: helperId,
-      deleteFlag: false,
-      breakTime: breakTime,
-      commutingRoute: commutingRoute,
-    );
+        id: '',
+        date: date,
+        startTime: startTime!,
+        endTime: endTime!,
+        roundUpEndTime: roundTimeToNearest15Minutes(endTime!),
+        fee: fee,
+        description: description,
+        user: UserManager().getUserId(selectedUser),
+        helperId: helperId,
+        deleteFlag: false,
+        breakTime: breakTime,
+        commutingRoute: commutingRoute,
+        workCategory: {
+          'categoryId': selectedParentCategory?.id ?? '',
+          'categoryName': selectedParentCategory?.name ?? '',
+          'childName': selectedSubCategory ?? '',
+        });
     if (mode == OpenFormPageMode.edit) {
       notifier.updateReport(report.copyWith(id: currentReport!.id));
     } else {
